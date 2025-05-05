@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Verifica se foi enviada uma foto
     if ($_FILES["foto"]["error"] == 0) {
         $nome_foto = uniqid() . "_" . basename($_FILES["foto"]["name"]);
-        $caminho = "pasta_fotos/" . $nome_foto;
+        $caminho = "fotos/" . $nome_foto;
         if (move_uploaded_file($_FILES["foto"]["tmp_name"], $caminho)) {
             $stmt = $conn->prepare("INSERT INTO publicacoes (especie, foto, usuario_id) VALUES (?, ?, ?)");
             $stmt->bind_param("ssi", $especie, $caminho, $usuario_id);
@@ -49,5 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </form>
 <p><?= $mensagem ?></p>
 <a href="painel.php">← Voltar</a>
+<script>
+    console.log ("<?php echo $_FILES?>")
+</script>
 </body>
 </html>
