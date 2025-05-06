@@ -31,6 +31,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <h2>Bem-vindo ao sistema de fotos de aves!</h2>
 
     <a href="publicar.php" class="btn btn-primary mt-3">Nova Publicação</a>
+    <a href="feed.php">Ver publicações</a>
 
     <?php if ($_SESSION['cargo'] === 'admin'): ?>
         <a href="admin.php" class="btn btn-warning mt-3 ms-2">Painel do Admin</a>

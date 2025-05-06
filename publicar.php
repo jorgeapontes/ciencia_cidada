@@ -1,35 +1,45 @@
 <?php
 session_start();
-include 'conexao.php';
-
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
 }
 
-$mensagem = '';
+include 'conexao.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $especie = $_POST["especie"];
-    $usuario_id = $_SESSION["usuario_id"];
+$mensagem = "";
 
-    // Verifica se foi enviada uma foto
-    if ($_FILES["foto"]["error"] == 0) {
-        $nome_foto = uniqid() . "_" . basename($_FILES["foto"]["name"]);
-        $caminho = "fotos/" . $nome_foto;
-        if (move_uploaded_file($_FILES["foto"]["tmp_name"], $caminho)) {
-            $stmt = $conn->prepare("INSERT INTO publicacoes (especie, foto, usuario_id) VALUES (?, ?, ?)");
-            $stmt->bind_param("ssi", $especie, $caminho, $usuario_id);
-            if ($stmt->execute()) {
-                $mensagem = "Foto publicada com sucesso!";
-            } else {
-                $mensagem = "Erro ao salvar no banco.";
-            }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $titulo = $_POST['titulo'];
+    $descricao = $_POST['descricao'];
+    $usuario_id = $_SESSION['usuario_id'];
+
+    // Nome correto do campo file
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+        $foto_temp = $_FILES['foto']['tmp_name'];
+        $foto_nome = uniqid() . "_" . $_FILES['foto']['name'];
+
+        $pasta = 'pasta_fotos/';
+
+        // Cria a pasta caso não exista
+        if (!is_dir($pasta)) {
+            mkdir($pasta, 0777, true);
+        }
+
+        $caminho = $pasta . $foto_nome;
+
+        if (move_uploaded_file($foto_temp, $caminho)) {
+            $stmt = $conn->prepare("INSERT INTO publicacoes (usuario_id, titulo, descricao, caminho_foto) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("isss", $usuario_id, $titulo, $descricao, $caminho);
+            $stmt->execute();
+
+            $mensagem = "Publicação realizada com sucesso!";
+            $stmt->close();
         } else {
-            $mensagem = "Erro ao enviar foto.";
+            $mensagem = "Erro ao mover a imagem.";
         }
     } else {
-        $mensagem = "Envie uma foto válida.";
+        $mensagem = "Nenhuma imagem foi enviada ou ocorreu um erro.";
     }
 }
 ?>
@@ -37,20 +47,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Publicar Foto</title>
+    <title>Nova Publicação</title>
 </head>
 <body>
-<h2>Nova Publicação</h2>
-<form method="POST" enctype="multipart/form-data">
-    Espécie: <input type="text" name="especie" required><br>
-    Foto: <input type="file" name="foto" accept="image/*" required><br>
-    <button type="submit">Publicar</button>
-</form>
-<p><?= $mensagem ?></p>
-<a href="painel.php">← Voltar</a>
-<script>
-    console.log ("<?php echo $_FILES?>")
-</script>
+    <h1>Nova Publicação</h1>
+
+    <?php if ($mensagem): ?>
+        <p><?php echo $mensagem; ?></p>
+        <?php if ($mensagem === "Publicação realizada com sucesso!"): ?>
+            <a href="feed.php"><button>Ir para o Feed</button></a>
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label>Título:</label><br>
+        <input type="text" name="titulo" required><br><br>
+
+        <label>Descrição:</label><br>
+        <textarea name="descricao" required></textarea><br><br>
+
+        <label>Foto da ave:</label><br>
+        <input type="file" name="foto" accept="image/*" required><br><br>
+
+        <input type="submit" value="Publicar">
+    </form>
 </body>
 </html>
