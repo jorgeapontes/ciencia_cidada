@@ -43,14 +43,13 @@ $result = $conn->query($sql);
 if ($result->num_rows > 0) {
     while ($post = $result->fetch_assoc()) {
         echo "<div class='post'>";
-        echo "<strong>{$post['especie']}</strong><br>";
-        echo "<em>por {$post['nome']} em {$post['data_publicacao']}</em><br><br>";
-        echo "<img src='{$post['foto']}' alt='Foto de {$post['especie']}'><br>";
+        echo "<strong>".htmlspecialchars($post['especific'])."</strong><br>";
+        echo "<strong>".htmlspecialchars($post['noem'])." - ".htmlspecialchars($post['data_publicacao'])."</strong><br>";
+        echo "<img src='posts_fotos/".htmlspecialchars($post['foto'])."' alt='Foto de ".htmlspecialchars($post['especific'])."'>";
         echo "</div>";
     }
 } else {
-    echo "Nenhuma publicação ainda.";
+    echo "nenhuma publicação ainda.";
 }
-?>
 </body>
 </html>
