@@ -12,7 +12,6 @@ if (!isset($_SESSION['usuario_id'])) {
     <meta charset="UTF-8">
     <title>Painel - Aves Brasil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="painel.css">
 </head>
 <body class="bg-light">
 
@@ -32,10 +31,11 @@ if (!isset($_SESSION['usuario_id'])) {
     <h2>Bem-vindo ao sistema de fotos de aves!</h2>
 
     <a href="publicar.php" class="btn btn-primary mt-3">Nova Publicação</a>
-    <a href="feed.php">Ver publicações</a>
+    <a href="feed.php" class="btn btn-info mt-3 ms-2">Ver publicações</a>
 
     <?php if ($_SESSION['cargo'] === 'admin'): ?>
-        <a href="admin.php" class="btn btn-warning mt-3 ms-2">Painel do Admin</a>
+        <a href="criar_admin.php" class="btn btn-warning mt-3 ms-2">Criar Novo Admin</a>
+        <a href="gerenciar_usuarios.php" class="btn btn-secondary mt-3 ms-2">Gerenciar Usuários</a>
     <?php endif; ?>
 </div>
 
