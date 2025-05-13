@@ -46,7 +46,10 @@ if (isset($_POST['excluir_publicacao'])) {
 <body class="bg-light">
 <div class="container mt-5">
     <h2>Painel de Administração</h2>
-    <a href="painel.php" class="btn btn-secondary mb-4">← Voltar ao Painel</a>
+    <div class="mb-4">
+        <a href="feed.php" class="btn btn-primary">Feed</a>
+        <a href="delete.php" class="btn btn-danger">Logout</a>
+    </div>
 
     <!-- Usuários -->
     <h4>Gerenciar Usuários</h4>
@@ -127,5 +130,54 @@ if (isset($_POST['excluir_publicacao'])) {
         </tbody>
     </table>
 </div>
+</body>
+</html><?php
+session_start();
+include 'conexao.php';
+
+// Verifica se é admin
+if (!isset($_SESSION['usuario_id']) || $_SESSION['cargo'] !== 'admin') {
+    header("Location: painel.php");
+    exit;
+}
+
+// Alterar cargo
+if (isset($_POST['alterar_cargo'])) {
+    $novoCargo = $_POST['cargo'];
+    $usuarioId = $_POST['usuario_id'];
+    $stmt = $conn->prepare("UPDATE usuarios SET cargo = ? WHERE id = ?");
+    $stmt->bind_param("si", $novoCargo, $usuarioId);
+    $stmt->execute();
+}
+
+// Excluir publicação
+if (isset($_POST['excluir_publicacao'])) {
+    $pubId = $_POST['pub_id'];
+    // Primeiro exclui a imagem do servidor
+    $busca = $conn->prepare("SELECT foto FROM publicacoes WHERE id = ?");
+    $busca->bind_param("i", $pubId);
+    $busca->execute();
+    $resultado = $busca->get_result();
+    if ($foto = $resultado->fetch_assoc()) {
+        if (file_exists($foto['foto'])) {
+            unlink($foto['foto']);
+        }
+    }
+    $stmt = $conn->prepare("DELETE FROM publicacoes WHERE id = ?");
+    $stmt->bind_param("i", $pubId);
+    $stmt->execute();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+   
 </body>
 </html>
