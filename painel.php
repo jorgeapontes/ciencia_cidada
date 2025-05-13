@@ -1,39 +1,104 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
-if (!isset($_SESSION['usuario_id']) || $_SESSION['cargo'] !== 'admin') {
+include 'conexao.php';
+
+// Verifica se o usuário está logado
+if (!isset($_SESSION["usuario_id"])) {
     header("Location: login.php");
     exit;
 }
+
+// Busca todas as postagens com informações do usuário e descrição
+$sql = "SELECT p.*, u.nome 
+        FROM postagens p 
+        JOIN usuarios u ON p.usuario_id = u.id 
+        ORDER BY p.data_postagem DESC";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Admin - Aves Brasil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - Aves Brasil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .postagem {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .postagem img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .postagem-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .postagem-usuario {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .postagem-data {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .postagem-descricao {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-        <div class="container">
-            <a class="navbar-brand" href="#">Aves Brasil</a>
-            <div class="d-flex">
-                <span class="navbar-text me-3 text-white">
-                    Olá, <?= $_SESSION['nome']; ?> (Admin)
-                </span>
-                <a href="logout.php" class="btn btn-outline-light">Sair</a>
+<body>
+    <?php include 'navbar.php'; ?>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <?php if ($result->num_rows > 0): ?>
+                    <?php while($postagem = $result->fetch_assoc()): ?>
+                        <div class="postagem">
+                            <div class="postagem-header">
+                                <img src="https://via.placeholder.com/40" alt="Foto do usuário" class="rounded-circle">
+                                <div>
+                                    <div class="postagem-usuario"><?= htmlspecialchars($postagem['nome']) ?></div>
+                                    <div class="postagem-data"><?= date('d/m/Y H:i', strtotime($postagem['data_postagem'])) ?></div>
+                                </div>
+                            </div>
+                            
+                            <img src="<?= htmlspecialchars($postagem['imagem_path']) ?>" alt="Postagem de ave">
+                            
+                            <!-- AQUI ESTÁ A DESCRIÇÃO -->
+                            <?php if (!empty($postagem['descricao'])): ?>
+                                <div class="postagem-descricao">
+                                    <?= nl2br(htmlspecialchars($postagem['descricao'])) ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary">Curtir</button>
+                                <button class="btn btn-sm btn-outline-secondary">Comentar</button>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="alert alert-info">Nenhuma postagem encontrada.</div>
+                <?php endif; ?>
             </div>
         </div>
-    </nav>
-
-    <div class="container mt-4">
-        <h2>Painel Administrativo</h2>
-        
-        <div class="d-flex gap-2 mt-3">
-            <a href="criar_admin.php" class="btn btn-warning">Criar Novo Admin</a>
-            <a href="gerenciar_usuarios.php" class="btn btn-secondary">Gerenciar Usuários</a>
-            <a href="feed.php" class="btn btn-primary">Ver Feed</a>
-        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

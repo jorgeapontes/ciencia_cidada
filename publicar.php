@@ -19,16 +19,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $foto_temp = $_FILES['foto']['tmp_name'];
         $foto_nome = uniqid() . "_" . $_FILES['foto']['name'];
 
-        $pasta = 'pasta_fotos/';
+        // Pasta de destino CORRIGIDA para "fotos/"
+        $pasta = 'fotos/';
 
         // Cria a pasta caso não exista
         if (!is_dir($pasta)) {
             mkdir($pasta, 0777, true);
         }
 
+        // Caminho CORRIGIDO para salvar no banco de dados
         $caminho = $pasta . $foto_nome;
 
-        if (move_uploaded_file($foto_temp, $caminho)) {
+        if (move_uploaded_file($foto_temp, __DIR__ . '/' . $caminho)) {
             $stmt = $conn->prepare("INSERT INTO publicacoes (usuario_id, titulo, descricao, caminho_foto) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("isss", $usuario_id, $titulo, $descricao, $caminho);
             $stmt->execute();

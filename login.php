@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 include 'conexao.php'; // Certifique-se que este arquivo existe
 
@@ -16,13 +20,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows === 1) {
         $usuario = $result->fetch_assoc();
-        
-        // Verifica a senha (com fallback temporário para '12345')
-        if (password_verify($senha, $usuario['senha']) || $senha === '12345') {
+
+        // Verifica a senha
+        if (password_verify($senha, $usuario['senha'])) {
             $_SESSION["usuario_id"] = $usuario['id'];
             $_SESSION["nome"] = $usuario['nome'];
             $_SESSION["cargo"] = $usuario['cargo'];
-            header("Location: painel.php");
+
+            if ($usuario['cargo'] === 'admin') {
+                header("Location: admin.php");
+            } elseif ($usuario['cargo'] === 'especialista') {
+                header("Location: painel_especialista.php");
+            } elseif ($usuario['cargo'] === 'user') {
+                header("Location: painel_usuario.php");
+            }
             exit;
         } else {
             $erro = "Senha incorreta!";
@@ -58,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
         <div class="login-container">
             <h2 class="text-center mb-4">Login</h2>
-            
+
             <?php if ($erro): ?>
                 <div class="alert alert-danger"><?= $erro ?></div>
             <?php endif; ?>
@@ -74,10 +85,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Entrar</button>
             </form>
-            
+
             <div class="mt-3 text-center">
-                <a href="cadastro.php">Criar nova conta</a> | 
-                <a href="recuperar_senha.php">Esqueci a senha</a>
+                <a href="cadastro.php">Criar nova conta</a> |
+                <a href="redefinir_senha.php">Esqueci a senha</a>
             </div>
         </div>
     </div>
