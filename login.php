@@ -63,6 +63,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+
+        .btn.btn-primary.w-100 {
+            background-color:green;
+        }
     </style>
 </head>
 <body>

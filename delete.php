@@ -1,48 +1,64 @@
 <?php
 session_start();
-if (!isset($_SESSION['usuario_id'])) {
+if (!isset($_SESSION["usuario_id"])) {
     header("Location: login.php");
     exit;
 }
 
 include 'conexao.php';
 
+// Verificar se é admin ou especialista
+if (!isset($_SESSION['cargo']) || ($_SESSION['cargo'] !== 'admin' && $_SESSION['cargo'] !== 'especialista')) {
+    header("Location: painel_usuario.php");
+    exit;
+}
+
+// Verificar se é para deletar publicação ou comentário
 if (isset($_GET['id'])) {
-    $publicacao_id = $_GET['id'];
+    // Deletar publicação (apenas admin)
+    if ($_SESSION['cargo'] === 'admin') {
+        $id = $_GET['id'];
+        
+        // Primeiro deletar os comentários relacionados
+        $stmt = $conn->prepare("DELETE FROM comentarios WHERE publicacao_id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        
+        // Depois deletar a publicação
+        $stmt = $conn->prepare("DELETE FROM publicacoes WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+    }
+    header("Location: feed.php");
+    exit;
     
-    // Primeiro verifica se a publicação existe e se o usuário tem permissão
-    $sql = "SELECT usuario_id FROM publicacoes WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $publicacao_id);
+} elseif (isset($_GET['comentario_id'])) {
+    // Deletar comentário
+    $comentario_id = $_GET['comentario_id'];
+    
+    // Verificar se o usuário é dono do comentário ou admin
+    $stmt = $conn->prepare("SELECT usuario_id FROM comentarios WHERE id = ?");
+    $stmt->bind_param("i", $comentario_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
-    if ($result->num_rows === 1) {
-        $publicacao = $result->fetch_assoc();
+    if ($result->num_rows > 0) {
+        $comentario = $result->fetch_assoc();
         
-        // Verifica se é o dono da publicação ou admin
-        if ($_SESSION['usuario_id'] == $publicacao['usuario_id'] || $_SESSION['cargo'] === 'admin') {
-            // Deleta a publicação
-            $sql_delete = "DELETE FROM publicacoes WHERE id = ?";
-            $stmt_delete = $conn->prepare($sql_delete);
-            $stmt_delete->bind_param("i", $publicacao_id);
-            
-            if ($stmt_delete->execute()) {
-                $_SESSION['mensagem'] = "Publicação excluída com sucesso!";
-            } else {
-                $_SESSION['erro'] = "Erro ao excluir publicação.";
-            }
-        } else {
-            $_SESSION['erro'] = "Você não tem permissão para excluir esta publicação.";
+        // Só pode deletar se for admin ou dono do comentário
+        if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $comentario['usuario_id']) {
+            $stmt = $conn->prepare("DELETE FROM comentarios WHERE id = ?");
+            $stmt->bind_param("i", $comentario_id);
+            $stmt->execute();
         }
-    } else {
-        $_SESSION['erro'] = "Publicação não encontrada.";
     }
     
-    header("Location: feed.php");
-    exit;
-} else {
-    header("Location: feed.php");
+    // Voltar para a página anterior
+    header("Location: " . $_SERVER['HTTP_REFERER']);
     exit;
 }
+
+// Se não for nenhum dos casos acima, redirecionar
+header("Location: feed.php");
+exit;
 ?>

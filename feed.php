@@ -22,11 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentar']) && $is_es
     $comentario = filter_input(INPUT_POST, 'comentario', FILTER_SANITIZE_SPECIAL_CHARS);
     
     if ($publicacao_id && $comentario) {
-        // Verifique se as colunas existem antes de inserir
-$stmt = $conn->prepare("INSERT INTO comentarios (publicacao_id, usuario_id, comentario, data_comentario) VALUES (?, ?, ?, NOW())");
-if (!$stmt) {
-    die("Erro ao preparar a query: " . $conn->error);
-}
+        $stmt = $conn->prepare("INSERT INTO comentarios (publicacao_id, usuario_id, comentario, data_comentario) VALUES (?, ?, ?, NOW())");
+        if (!$stmt) {
+            die("Erro ao preparar a query: " . $conn->error);
+        }
         $stmt->bind_param("iis", $publicacao_id, $_SESSION['usuario_id'], $comentario);
         $stmt->execute();
         
@@ -72,9 +71,11 @@ $resultado = $stmt->get_result();
         .badge { margin-left: 5px; }
         .comentarios-container { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
         .comentario { padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px; }
-        .comentario-info { font-size: 0.8em; color: #6c757d; margin-bottom: 5px; }
+        .comentario-info { display: flex; justify-content: space-between; align-items: center; font-size: 0.8em; color: #6c757d; margin-bottom: 5px; }
         .form-comentario { margin-top: 15px; }
         .comentario-autor { font-weight: bold; color: #495057; }
+        .bi-trash { transition: color 0.2s; cursor: pointer; }
+        .bi-trash:hover { color: #dc3545 !important; }
     </style>
 </head>
 <body>
@@ -142,7 +143,7 @@ $resultado = $stmt->get_result();
                         <?php
                         // Buscar comentários para esta publicação
                         $stmt_comentarios = $conn->prepare("
-                            SELECT c.*, u.nome, u.cargo 
+                            SELECT c.*, u.nome, u.cargo, u.id as usuario_id 
                             FROM comentarios c
                             JOIN usuarios u ON c.usuario_id = u.id
                             WHERE c.publicacao_id = ?
@@ -160,7 +161,18 @@ $resultado = $stmt->get_result();
                                             <?= htmlspecialchars($comentario['nome']) ?>
                                             <?= ($comentario['cargo'] === 'especialista') ? '<span class="badge bg-info">Especialista</span>' : '' ?>
                                         </span>
-                                        em <?= date('d/m/Y H:i', strtotime($comentario['data_comentario'])) ?>
+                                        <span>
+                                            <?= date('d/m/Y H:i', strtotime($comentario['data_comentario'])) ?>
+                                            <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $comentario['usuario_id']): ?>
+                                                <a href="delete.php?comentario_id=<?= $comentario['id'] ?>" 
+                                                   onclick="return confirm('Tem certeza que deseja excluir este comentário?')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash ms-2" viewBox="0 0 16 16">
+                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                                                    </svg>
+                                                </a>
+                                            <?php endif; ?>
+                                        </span>
                                     </div>
                                     <p><?= nl2br(htmlspecialchars($comentario['comentario'])) ?></p>
                                 </div>
