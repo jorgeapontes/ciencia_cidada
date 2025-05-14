@@ -22,61 +22,31 @@ if (isset($_SESSION['cargo'])) {
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin');
 
-// Processar novo comentário se for enviado por um especialista ou admin
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['comentar']) && $pode_interagir) {
-        $publicacao_id = filter_input(INPUT_POST, 'publicacao_id', FILTER_VALIDATE_INT);
-        $comentario = filter_input(INPUT_POST, 'comentario', FILTER_SANITIZE_SPECIAL_CHARS);
+// Processar interação (like/dislike)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['interagir']) && $pode_interagir) {
+    $publicacao_id = filter_input(INPUT_POST, 'publicacao_id', FILTER_VALIDATE_INT);
+    $tipo = filter_input(INPUT_POST, 'tipo', FILTER_SANITIZE_SPECIAL_CHARS);
 
-        if ($publicacao_id && $comentario) {
-            $stmt = $conn->prepare("INSERT INTO comentarios (publicacao_id, usuario_id, comentario, data_comentario) VALUES (?, ?, ?, NOW())");
-            $stmt->bind_param("iis", $publicacao_id, $_SESSION['usuario_id'], $comentario);
-            $stmt->execute();
-            header("Location: feed.php");
-            exit;
+    if ($publicacao_id && ($tipo === 'like' || $tipo === 'dislike')) {
+        // Verificar se o usuário já interagiu com esta publicação
+        $stmt_check = $conn->prepare("SELECT id FROM interacoes WHERE usuario_id = ? AND publicacao_id = ?");
+        $stmt_check->bind_param("ii", $_SESSION['usuario_id'], $publicacao_id);
+        $stmt_check->execute();
+        $resultado_check = $stmt_check->get_result();
+
+        if ($resultado_check->num_rows > 0) {
+            // Usuário já interagiu, pode atualizar a interação
+            $stmt_update = $conn->prepare("UPDATE interacoes SET tipo = ? WHERE usuario_id = ? AND publicacao_id = ?");
+            $stmt_update->bind_param("sii", $tipo, $_SESSION['usuario_id'], $publicacao_id);
+            $stmt_update->execute();
+        } else {
+            // Usuário não interagiu, inserir nova interação
+            $stmt_insert = $conn->prepare("INSERT INTO interacoes (usuario_id, publicacao_id, tipo) VALUES (?, ?, ?)");
+            $stmt_insert->bind_param("iis", $_SESSION['usuario_id'], $publicacao_id, $tipo);
+            $stmt_insert->execute();
         }
-    }
-
-    // Processar edição de comentário
-    if (isset($_POST['editar_comentario']) && $pode_interagir) {
-        $comentario_id = filter_input(INPUT_POST, 'comentario_id', FILTER_VALIDATE_INT);
-        $novo_comentario = filter_input(INPUT_POST, 'novo_comentario', FILTER_SANITIZE_SPECIAL_CHARS);
-
-        if ($comentario_id && $novo_comentario) {
-            $stmt = $conn->prepare("UPDATE comentarios SET comentario = ? WHERE id = ?");
-            $stmt->bind_param("si", $novo_comentario, $comentario_id);
-            $stmt->execute();
-            header("Location: feed.php");
-            exit;
-        }
-    }
-
-    // Processar interação (like/dislike)
-    if (isset($_POST['interagir']) && $pode_interagir) {
-        $publicacao_id = filter_input(INPUT_POST, 'publicacao_id', FILTER_VALIDATE_INT);
-        $tipo = filter_input(INPUT_POST, 'tipo', FILTER_SANITIZE_SPECIAL_CHARS);
-
-        if ($publicacao_id && ($tipo === 'like' || $tipo === 'dislike')) {
-            // Verificar se o usuário já interagiu com esta publicação
-            $stmt_check = $conn->prepare("SELECT id FROM interacoes WHERE usuario_id = ? AND publicacao_id = ?");
-            $stmt_check->bind_param("ii", $_SESSION['usuario_id'], $publicacao_id);
-            $stmt_check->execute();
-            $resultado_check = $stmt_check->get_result();
-
-            if ($resultado_check->num_rows > 0) {
-                // Usuário já interagiu, pode atualizar a interação
-                $stmt_update = $conn->prepare("UPDATE interacoes SET tipo = ? WHERE usuario_id = ? AND publicacao_id = ?");
-                $stmt_update->bind_param("sii", $tipo, $_SESSION['usuario_id'], $publicacao_id);
-                $stmt_update->execute();
-            } else {
-                // Usuário não interagiu, inserir nova interação
-                $stmt_insert = $conn->prepare("INSERT INTO interacoes (usuario_id, publicacao_id, tipo) VALUES (?, ?, ?)");
-                $stmt_insert->bind_param("iis", $_SESSION['usuario_id'], $publicacao_id, $tipo);
-                $stmt_insert->execute();
-            }
-            header("Location: feed.php");
-            exit;
-        }
+        header("Location: feed.php");
+        exit;
     }
 }
 
@@ -104,7 +74,6 @@ $resultado = $stmt->get_result();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/feed.css">
-
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
@@ -171,10 +140,9 @@ $resultado = $stmt->get_result();
 
                     <div class="comentarios-container">
                         <h6>Comentários</h6>
-
                         <?php
                         $stmt_comentarios = $conn->prepare("
-                            SELECT c.*, u.nome, u.cargo, u.id as usuario_id
+                            SELECT c.*, u.nome, u.cargo
                             FROM comentarios c
                             JOIN usuarios u ON c.usuario_id = u.id
                             WHERE c.publicacao_id = ?
@@ -186,58 +154,25 @@ $resultado = $stmt->get_result();
 
                         if ($comentarios->num_rows > 0):
                             while ($comentario = $comentarios->fetch_assoc()): ?>
-                                <div class="comentario">
+                                <div class="comentario visualizacao-apenas">
                                     <div class="comentario-info">
                                         <span class="comentario-autor">
                                             <?= htmlspecialchars($comentario['nome']) ?>
                                             <?= ($comentario['cargo'] === 'especialista') ? '<span class="badge bg-info">Especialista</span>' : '' ?>
                                             <?= ($comentario['cargo'] === 'admin') ? '<span class="badge bg-danger">Admin</span>' : '' ?>
+                                            <?= ($comentario['cargo'] === 'user') ? '<span class="badge bg-secondary">Usuário</span>' : '' ?>
                                         </span>
                                         <span>
                                             <?= date('d/m/Y H:i', strtotime($comentario['data_comentario'])) ?>
-                                            <?php if ($pode_interagir || $_SESSION['usuario_id'] === $comentario['usuario_id']): ?>
-                                                <button class="btn-edit" onclick="toggleEditForm(<?= $comentario['id'] ?>)">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <a href="delete.php?comentario_id=<?= $comentario['id'] ?>"
-                                                   onclick="return confirm('Tem certeza que deseja excluir este comentário?')">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            <?php endif; ?>
                                         </span>
                                     </div>
-
-                                    <p id="comentario-text-<?= $comentario['id'] ?>">
+                                    <p class="comentario-text">
                                         <?= nl2br(htmlspecialchars($comentario['comentario'])) ?>
                                     </p>
-
-                                    <div id="edit-form-<?= $comentario['id'] ?>" class="edit-form">
-                                        <form method="POST">
-                                            <input type="hidden" name="comentario_id" value="<?= $comentario['id'] ?>">
-                                            <textarea class="form-control mb-2" name="novo_comentario" rows="2"><?= htmlspecialchars($comentario['comentario']) ?></textarea>
-                                            <button type="submit" name="editar_comentario" class="btn btn-primary btn-sm">Salvar</button>
-                                            <button type="button" onclick="toggleEditForm(<?= $comentario['id'] ?>)" class="btn btn-secondary btn-sm">Cancelar</button>
-                                        </form>
-                                    </div>
                                 </div>
                             <?php endwhile;
                         else: ?>
                             <div class="alert alert-secondary">Nenhum comentário ainda.</div>
-                        <?php endif; ?>
-
-                        <?php if ($pode_interagir): ?>
-                            <form method="POST" class="form-comentario">
-                                <input type="hidden" name="publicacao_id" value="<?= $pub['id'] ?>">
-                                <div class="mb-3">
-                                    <textarea class="form-control" name="comentario" rows="2"
-                                              placeholder="Adicione um comentário..." required></textarea>
-                                </div>
-                                <button type="submit" name="comentar" class="btn btn-primary btn-sm">Enviar Comentário</button>
-                            </form>
-                        <?php else: ?>
-                            <div class="alert alert-info mt-3 no-comment-box">
-                                Apenas especialistas e administradores podem comentar.
-                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -248,20 +183,5 @@ $resultado = $stmt->get_result();
             <div class="alert alert-info">Nenhuma publicação encontrada.</div>
         <?php endif; ?>
     </div>
-
-    <script>
-        function toggleEditForm(commentId) {
-            const textElement = document.getElementById(`comentario-text-${commentId}`);
-            const formElement = document.getElementById(`edit-form-${commentId}`);
-
-            if (textElement.style.display === 'none') {
-                textElement.style.display = 'block';
-                formElement.style.display = 'none';
-            } else {
-                textElement.style.display = 'none';
-                formElement.style.display = 'block';
-            }
-        }
-    </script>
 </body>
 </html>

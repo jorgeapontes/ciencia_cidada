@@ -22,7 +22,7 @@ if (!isset($_SESSION["usuario_id"]) || $_SESSION["cargo"] !== 'user') {
 
         <div class="d-grid gap-2 col-6 mx-auto mt-4">
             <a href="publicar.php" class="btn btn-success btn-lg">Nova Publicação</a>
-            <a href="feed.php" class="btn btn-primary btn-lg">Ver Feed</a>
+            <a href="feed_user.php" class="btn btn-primary btn-lg">Ver Feed</a>
             <a href="logout.php" class="btn btn-danger mt-3">Sair</a>
         </div>
     </div>
