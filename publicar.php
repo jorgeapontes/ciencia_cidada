@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Nova Publicação</title>
+    <link rel="stylesheet" href="css/publicar.css">
 </head>
 <body>
     <h1>Nova Publicação</h1>

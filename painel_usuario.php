@@ -13,7 +13,7 @@ if (!isset($_SESSION["usuario_id"]) || $_SESSION["cargo"] !== 'user') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de usuário</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="painel.css">
+    <link rel="stylesheet" href="css/painel_usuario.css">
 </head>
 <body>
     <div class="container mt-5 text-center">
