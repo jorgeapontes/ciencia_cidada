@@ -20,41 +20,41 @@ if (isset($_POST['alterar_cargo'])) {
 // Excluir publicação
 if (isset($_POST['excluir_publicacao'])) {
     $pubId = $_POST['pub_id'];
-    
+
     try {
         // Inicia transação
         $conn->begin_transaction();
-        
+
         // 1. Primeiro exclui os comentários relacionados
         $stmt = $conn->prepare("DELETE FROM comentarios WHERE publicacao_id = ?");
         $stmt->bind_param("i", $pubId);
         $stmt->execute();
-        
+
         // 2. Exclui as interações (likes/dislikes) relacionadas
         $stmt = $conn->prepare("DELETE FROM interacoes WHERE publicacao_id = ?");
         $stmt->bind_param("i", $pubId);
         $stmt->execute();
-        
+
         // 3. Busca a foto para excluir do servidor
         $busca = $conn->prepare("SELECT foto FROM publicacoes WHERE id = ?");
         $busca->bind_param("i", $pubId);
         $busca->execute();
         $resultado = $busca->get_result();
-        
+
         if ($foto = $resultado->fetch_assoc()) {
             if (file_exists($foto['foto'])) {
                 unlink($foto['foto']);
             }
         }
-        
+
         // 4. Agora exclui a publicação
         $stmt = $conn->prepare("DELETE FROM publicacoes WHERE id = ?");
         $stmt->bind_param("i", $pubId);
         $stmt->execute();
-        
+
         // Confirma a transação
         $conn->commit();
-        
+
     } catch (Exception $e) {
         // Em caso de erro, desfaz a transação
         $conn->rollback();
@@ -113,13 +113,12 @@ if (isset($_POST['excluir_publicacao'])) {
 <body>
     <div class="admin-container">
         <h2 class="text-center mb-4">Painel de Administração</h2>
-        
+
         <div class="nav-buttons">
             <a href="feed.php" class="btn btn-primary">Feed</a>
-            <a href="delete.php" class="btn btn-danger">Logout</a>
+            <a href="logout.php" class="btn btn-danger">Logout</a>
         </div>
 
-        <!-- Usuários -->
         <div class="table-container">
             <h4 class="section-title">Gerenciar Usuários</h4>
             <div class="table-responsive">
@@ -161,7 +160,6 @@ if (isset($_POST['excluir_publicacao'])) {
             </div>
         </div>
 
-        <!-- Publicações -->
         <div class="table-container">
             <h4 class="section-title">Gerenciar Publicações</h4>
             <div class="table-responsive">
@@ -179,8 +177,8 @@ if (isset($_POST['excluir_publicacao'])) {
                     <tbody>
                         <?php
                         $publicacoes = $conn->query("
-                            SELECT publicacoes.*, usuarios.nome FROM publicacoes 
-                            JOIN usuarios ON publicacoes.usuario_id = usuarios.id 
+                            SELECT publicacoes.*, usuarios.nome FROM publicacoes
+                            JOIN usuarios ON publicacoes.usuario_id = usuarios.id
                             ORDER BY publicacoes.data_publicacao DESC
                         ");
                         while ($pub = $publicacoes->fetch_assoc()):

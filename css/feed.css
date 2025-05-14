@@ -1,0 +1,301 @@
+/* css/feed.css */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    line-height: 1.6;
+}
+
+.navbar {
+    background-color: #343a40;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-title {
+    color: white; /* A frase "Ciência Cidadã" agora é branca */
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-link {
+    color: #adb5bd;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease-in-out;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.feed-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-color: #fff;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    width: 100%; /* Mantém a largura total do card */
+    max-height: 400px; /* Define uma altura máxima para as imagens */
+    aspect-ratio: 1 / 1; /* Força a proporção quadrada */
+    object-fit: cover;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.post-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+    color: #777;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.post-info strong {
+    color: #555;
+    font-weight: 500;
+}
+
+.card-text {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    align-items: center;
+}
+
+.btn-group {
+    margin-right: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-like, .btn-dislike {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.btn-like {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.btn-like:hover {
+    background-color: #218838;
+}
+
+.btn-dislike {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-dislike:hover {
+    background-color: #c82333;
+}
+
+.disabled-btn {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.badge {
+    margin-left: 0.3rem;
+    font-size: 0.75rem;
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    border: 1px solid #dee2e6;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
+}
+
+.comentarios-container {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.comentario {
+    padding: 0.75rem;
+    background-color: #f9f9f9;
+    border-radius: 0.3rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #eee;
+}
+
+.comentario-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 0.3rem;
+}
+
+.comentario-autor {
+    font-weight: bold;
+    color: #495057;
+}
+
+.form-comentario {
+    margin-top: 1rem;
+}
+
+.form-control {
+    border-radius: 0.3rem;
+    border: 1px solid #ced4da;
+    padding: 0.4rem 0.75rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.3rem;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 0.8rem;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.3rem;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 0.8rem;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.alert {
+    padding: 0.6rem 1rem;
+    border-radius: 0.3rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-secondary {
+    background-color: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #d6d8db;
+}
+
+/* Layout responsivo */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .card-img-top {
+        border-radius: 0.5rem 0.5rem 0 0;
+        max-height: none; /* Remove a altura máxima em telas menores para melhor responsividade */
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .btn-group {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .btn-like, .btn-dislike {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .feed-container {
+        padding: 0 0.5rem;
+    }
+}
