@@ -13,9 +13,9 @@ if (!isset($_SESSION["usuario_id"])) {
 }
 
 // Busca todas as postagens com informações do usuário e descrição
-$sql = "SELECT p.*, u.nome 
-        FROM postagens p 
-        JOIN usuarios u ON p.usuario_id = u.id 
+$sql = "SELECT p.*, u.nome
+        FROM postagens p
+        JOIN usuarios u ON p.usuario_id = u.id
         ORDER BY p.data_postagem DESC";
 $result = $conn->query($sql);
 ?>
@@ -58,10 +58,22 @@ $result = $conn->query($sql);
             background-color: #f8f9fa;
             border-radius: 5px;
         }
+        .navbar {
+            margin-bottom: 20px; /* Adiciona espaço abaixo da navbar */
+        }
     </style>
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Aves Brasil</a>
+            <div class="navbar-nav">
+                <a class="nav-link active" href="painel.php">Feed Geral</a>
+                <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                <a class="nav-link" href="logout.php">Sair</a>
+            </div>
+        </div>
+    </nav>
 
     <div class="container mt-5">
         <div class="row">
@@ -76,16 +88,15 @@ $result = $conn->query($sql);
                                     <div class="postagem-data"><?= date('d/m/Y H:i', strtotime($postagem['data_postagem'])) ?></div>
                                 </div>
                             </div>
-                            
+
                             <img src="<?= htmlspecialchars($postagem['imagem_path']) ?>" alt="Postagem de ave">
-                            
-                            <!-- AQUI ESTÁ A DESCRIÇÃO -->
+
                             <?php if (!empty($postagem['descricao'])): ?>
                                 <div class="postagem-descricao">
                                     <?= nl2br(htmlspecialchars($postagem['descricao'])) ?>
                                 </div>
                             <?php endif; ?>
-                            
+
                             <div class="mt-2">
                                 <button class="btn btn-sm btn-outline-primary">Curtir</button>
                                 <button class="btn btn-sm btn-outline-secondary">Comentar</button>

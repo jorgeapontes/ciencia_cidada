@@ -115,7 +115,8 @@ if (isset($_POST['excluir_publicacao'])) {
         <h2 class="text-center mb-4">Painel de Administração</h2>
 
         <div class="nav-buttons">
-            <a href="feed.php" class="btn btn-primary">Feed</a>
+            <a href="feed.php" class="btn btn-primary">Feed Geral</a>
+            <a href="feed_atropelamentos.php" class="btn btn-info">Atropelamentos</a>
             <a href="logout.php" class="btn btn-danger">Logout</a>
         </div>
 

@@ -2,7 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['cargo'] !== 'especialista') {
+if (!isset($_SESSION['usuario_id'])) {
     echo json_encode(['erro' => 'Acesso negado']);
     exit;
 }
@@ -20,27 +20,37 @@ if (!$publicacao_id || !in_array($tipo, ['like', 'dislike'])) {
 try {
     // Remove qualquer interação existente do usuário nesta publicação
     $conn->begin_transaction();
-    
-    $stmt = $conn->prepare("DELETE FROM interacoes WHERE publicacao_id = ? AND usuario_id = ?");
-    $stmt->bind_param("ii", $publicacao_id, $_SESSION['usuario_id']);
-    $stmt->execute();
-    
+
+    $stmt_delete = $conn->prepare("DELETE FROM interacoes WHERE publicacao_id = ? AND usuario_id = ?");
+    $stmt_delete->bind_param("ii", $publicacao_id, $_SESSION['usuario_id']);
+    $stmt_delete->execute();
+
     // Adiciona a nova interação
-    $stmt = $conn->prepare("INSERT INTO interacoes (publicacao_id, usuario_id, tipo) VALUES (?, ?, ?)");
-    $stmt->bind_param("iis", $publicacao_id, $_SESSION['usuario_id'], $tipo);
-    $stmt->execute();
-    
+    $stmt_insert = $conn->prepare("INSERT INTO interacoes (publicacao_id, usuario_id, tipo) VALUES (?, ?, ?)");
+    $stmt_insert->bind_param("iis", $publicacao_id, $_SESSION['usuario_id'], $tipo);
+    $stmt_insert->execute();
+
     $conn->commit();
-    
+
     // Obtém as contagens atualizadas
-    $likes = $conn->query("SELECT COUNT(*) FROM interacoes WHERE publicacao_id = $publicacao_id AND tipo = 'like'")->fetch_row()[0];
-    $dislikes = $conn->query("SELECT COUNT(*) FROM interacoes WHERE publicacao_id = $publicacao_id AND tipo = 'dislike'")->fetch_row()[0];
-    
+    $stmt_likes = $conn->prepare("SELECT COUNT(*) FROM interacoes WHERE publicacao_id = ? AND tipo = 'like'");
+    $stmt_likes->bind_param("i", $publicacao_id);
+    $stmt_likes->execute();
+    $likes = $stmt_likes->get_result()->fetch_row()[0];
+    $stmt_likes->close();
+
+    $stmt_dislikes = $conn->prepare("SELECT COUNT(*) FROM interacoes WHERE publicacao_id = ? AND tipo = 'dislike'");
+    $stmt_dislikes->bind_param("i", $publicacao_id);
+    $stmt_dislikes->execute();
+    $dislikes = $stmt_dislikes->get_result()->fetch_row()[0];
+    $stmt_dislikes->close();
+
     echo json_encode([
         'success' => true,
         'likes' => $likes,
         'dislikes' => $dislikes
     ]);
+
 } catch (Exception $e) {
     $conn->rollback();
     echo json_encode(['erro' => 'Erro ao processar interação']);

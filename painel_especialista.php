@@ -19,9 +19,10 @@ if (!isset($_SESSION["usuario_id"]) || $_SESSION["cargo"] !== 'especialista') {
     <div class="container mt-5">
         <h1>Painel do Especialista</h1>
         <p>Bem-vindo(a), <?php echo $_SESSION["nome"]; ?>!</p>
-        <p><a href="publicar.php" class="btn btn-success">NOVA PUBLICAÇÃO</a></p>
-        <p><a href="feed.php" class="btn btn-primary">VER FEED</a></p>
-        <p><a href="logout.php" class="btn btn-danger">SAIR</a></p>
+        <p><a href="publicar.php" class="btn btn-success me-2">NOVA PUBLICAÇÃO</a>
+           <a href="feed_user.php" class="btn btn-primary me-2">VER FEED</a>
+           <a href="feed_atropelamentos.php" class="btn btn-info me-2">Atropelamentos</a>
+           <a href="logout.php" class="btn btn-danger">SAIR</a></p>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

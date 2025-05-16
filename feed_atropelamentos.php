@@ -22,15 +22,16 @@ if (isset($_SESSION['cargo'])) {
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
 
-// Buscar publicações
+// Buscar todos os casos de atropelamento
 $stmt = $conn->prepare("
-    SELECT p.*, u.nome, u.id as usuario_id,
-    (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = p.id AND tipo = 'like') AS likes,
-    (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = p.id AND tipo = 'dislike') AS dislikes,
-    (SELECT tipo FROM interacoes WHERE publicacao_id = p.id AND usuario_id = ?) AS minha_interacao
-    FROM publicacoes p
-    JOIN usuarios u ON p.usuario_id = u.id
-    ORDER BY p.id DESC");
+    SELECT a.*, u.nome, u.id as usuario_id,
+    (SELECT COUNT(*) FROM interacoes_atropelamentos WHERE atropelamento_id = a.id AND tipo = 'like') AS likes,
+    (SELECT COUNT(*) FROM interacoes_atropelamentos WHERE atropelamento_id = a.id AND tipo = 'dislike') AS dislikes,
+    (SELECT tipo FROM interacoes_atropelamentos WHERE atropelamento_id = a.id AND usuario_id = ?) AS minha_interacao
+    FROM atropelamentos a
+    JOIN usuarios u ON a.usuario_id = u.id
+    ORDER BY a.data_postagem DESC
+");
 $stmt->bind_param("i", $_SESSION['usuario_id']);
 $stmt->execute();
 $resultado = $stmt->get_result();
@@ -41,16 +42,16 @@ $resultado = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feed de Publicações</title>
+    <title>Casos de Atropelamento - Serra do Japi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/feed.css">
     <style>
         .like-active {
-            color: blue !important; /* Cor para indicar que o usuário curtiu */
+            color: blue !important;
         }
         .dislike-active {
-            color: red !important; /* Cor para indicar que o usuário descurtiu */
+            color: red !important;
         }
         .like-button:hover, .dislike-button:hover {
             cursor: pointer;
@@ -64,14 +65,16 @@ $resultado = $stmt->get_result();
             <div class="navbar-nav">
                 <a class="nav-link" href="home.html">Home</a>
                 <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>
-                <a class="nav-link active" href="feed_user.php">Seu Feed</a>
-                <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                <a class="nav-link" href="feed_user.php">Feed Geral</a>
+                <a class="nav-link" href="publicar.php">Publicar</a>
+                <a class="nav-link active" href="feed_atropelamentos.php">Atropelamentos</a>
                 <a class="nav-link" href="logout.php">Sair</a>
             </div>
         </div>
     </nav>
 
     <div class="feed-container">
+        <h2>Casos de Atropelamento de Animais - Serra do Japi</h2>
         <?php while ($pub = $resultado->fetch_assoc()): ?>
             <div class="card">
                 <?php
@@ -80,7 +83,7 @@ $resultado = $stmt->get_result();
                 ?>
 
                 <?php if (file_exists(__DIR__ . "/" . $caminho_imagem)): ?>
-                    <img src="<?= $caminho_imagem ?>" class="card-img-top" alt="<?= htmlspecialchars($pub['titulo'] ?? '') ?>">
+                    <img src="<?= $caminho_imagem ?>" class="card-img-top" alt="<?= htmlspecialchars($pub['especie'] ?? '') ?>">
                 <?php else: ?>
                     <div class="bg-secondary text-white p-5 text-center">
                         Imagem não encontrada
@@ -88,11 +91,17 @@ $resultado = $stmt->get_result();
                 <?php endif; ?>
 
                 <div class="card-body">
-                    <h5 class="card-title"><?= htmlspecialchars($pub['titulo'] ?? '') ?></h5>
+                    <h5 class="card-title"><?= htmlspecialchars($pub['especie'] ?? '') ?></h5>
                     <div class="post-info">
                         <strong>Por:</strong> <?= htmlspecialchars($pub['nome'] ?? 'Desconhecido') ?>
                         |
-                        <strong>Data:</strong> <?= date('d/m/Y H:i', strtotime($pub['data_publicacao'] ?? '')) ?>
+                        <strong>Data:</strong> <?= date('d/m/Y H:i', strtotime($pub['data_postagem'] ?? '')) ?>
+                        <?php if (!empty($pub['data_ocorrencia'])): ?>
+                            | <strong>Ocorrência:</strong> <?= date('d/m/Y H:i', strtotime($pub['data_ocorrencia'])) ?>
+                        <?php endif; ?>
+                        <?php if (!empty($pub['localizacao'])): ?>
+                            | <strong>Localização:</strong> <?= htmlspecialchars($pub['localizacao']) ?>
+                        <?php endif; ?>
                     </div>
                     <p class="card-text"><?= nl2br(htmlspecialchars($pub['descricao'] ?? '')) ?></p>
 
@@ -109,8 +118,8 @@ $resultado = $stmt->get_result();
                         </div>
 
                         <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $pub['usuario_id']): ?>
-                            <a href="delete.php?id=<?= $pub['id'] ?>" class="btn btn-danger btn-sm ms-auto"
-                               onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">
+                            <a href="delete_atropelamento.php?id=<?= $pub['id'] ?>" class="btn btn-danger btn-sm ms-auto"
+                               onclick="return confirm('Tem certeza que deseja excluir este caso de atropelamento?')">
                                 Excluir
                             </a>
                         <?php endif; ?>
@@ -120,11 +129,11 @@ $resultado = $stmt->get_result();
                         <h6>Comentários</h6>
                         <?php
                         $stmt_comentarios = $conn->prepare("
-                            SELECT c.*, u.nome, u.cargo
-                            FROM comentarios c
-                            JOIN usuarios u ON c.usuario_id = u.id
-                            WHERE c.publicacao_id = ?
-                            ORDER BY c.data_comentario ASC
+                            SELECT ca.*, u.nome, u.cargo
+                            FROM comentarios_atropelamentos ca
+                            JOIN usuarios u ON ca.usuario_id = u.id
+                            WHERE ca.atropelamento_id = ?
+                            ORDER BY ca.data_comentario ASC
                         ");
                         $stmt_comentarios->bind_param("i", $pub['id']);
                         $stmt_comentarios->execute();
@@ -158,7 +167,7 @@ $resultado = $stmt->get_result();
         <?php endwhile; ?>
 
         <?php if ($resultado->num_rows === 0): ?>
-            <div class="alert alert-info">Nenhuma publicação encontrada.</div>
+            <div class="alert alert-info">Nenhum caso de atropelamento registrado.</div>
         <?php endif; ?>
     </div>
 
@@ -176,12 +185,12 @@ $resultado = $stmt->get_result();
                     const dislikeCountSpan = document.querySelector('.dislike-count-' + publicacaoId);
                     const icone = this.querySelector('i');
 
-                    fetch('interacao.php', {
+                    fetch('interacao_atropelamento.php', { // Crie este novo arquivo para interações de atropelamentos
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
-                        body: `publicacao_id=${encodeURIComponent(publicacaoId)}&tipo=${encodeURIComponent(tipo)}`
+                        body: `atropelamento_id=${encodeURIComponent(publicacaoId)}&tipo=${encodeURIComponent(tipo)}`
                     })
                     .then(response => response.json())
                     .then(data => {
