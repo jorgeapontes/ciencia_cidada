@@ -1,7 +1,32 @@
 <?php
 session_start();
-if (!isset($_SESSION["usuario_id"])) {
-    header("Location: login.php");
+if (!isset($_SESSION['usuario_id'])) {
+    $html = <<<HTML
+    <!DOCTYPE html>
+    <html lang='pt-br'>
+    <head>
+        <meta charset='UTF-8'>
+        <title>Acesso Negado</title>
+        <style>
+            body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+            .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: center; }
+            h1 { color: #d9534f; margin-bottom: 20px; }
+            p { margin-bottom: 15px; }
+            .login-link { color: #007bff; text-decoration: none; font-weight: bold; }
+            .login-link:hover { text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <h1>Acesso Negado</h1>
+            <p>Você precisa estar logado para acessar esta página.</p>
+            <p><a href='login.php' class='login-link'>Fazer Login</a></p>
+        </div>
+    </body>
+    </html>
+    HTML;
+
+    echo $html;
     exit;
 }
 
@@ -20,7 +45,7 @@ if (isset($_GET['id'])) {
         $result = $stmt->get_result();
         
         if ($result->num_rows === 0) {
-            header("Location: feed.php");
+            header("Location: feed_user.php");
             exit;
         }
         
@@ -28,7 +53,7 @@ if (isset($_GET['id'])) {
         
         // Só pode deletar se for admin ou dono da publicação
         if ($_SESSION['cargo'] !== 'admin' && $_SESSION['usuario_id'] !== $publicacao['usuario_id']) {
-            header("Location: feed.php");
+            header("Location: feed_user.php");
             exit;
         }
         
@@ -62,7 +87,7 @@ if (isset($_GET['id'])) {
         $stmt->execute();
         
         $conn->commit();
-        header("Location: feed.php");
+        header("Location: feed_user.php");
         exit;
         
     } catch (Exception $e) {
@@ -94,6 +119,6 @@ if (isset($_GET['id'])) {
     exit;
 }
 
-header("Location: feed.php");
+header("Location: feed_user.php");
 exit;
 ?>

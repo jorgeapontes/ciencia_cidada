@@ -1,10 +1,51 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
+<?php
 session_start();
 include 'conexao.php';
+if (!isset($_SESSION['usuario_id'])) {
+    $html = <<<HTML
+    <!DOCTYPE html>
+    <html lang='pt-br'>
+    <head>
+        <meta charset='UTF-8'>
+        <title>Acesso Negado</title>
+        <style>
+            body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+            .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: center; }
+            h1 { color: #d9534f; margin-bottom: 20px; }
+            p { margin-bottom: 15px; }
+            .login-link { color: #007bff; text-decoration: none; font-weight: bold; }
+            .login-link:hover { text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <h1>Acesso Negado</h1>
+            <p>Você precisa estar logado para acessar esta página.</p>
+            <p><a href='login.php' class='login-link'>Fazer Login</a></p>
+        </div>
+    </body>
+    </html>
+    HTML;
+
+    echo $html;
+    exit;
+}
 
 // Verifica se é admin
-if (!isset($_SESSION['usuario_id']) || $_SESSION['cargo'] !== 'admin') {
-    header("Location: painel.php");
+if ($_SESSION['cargo'] !== 'admin') {
+    if ($_SESSION['cargo'] === 'especialista') {
+        header("Location: painel_especialista.php");
+    } elseif ($_SESSION['cargo'] === 'user') {
+        header("Location: painel_usuario.php");
+    } else {
+        // Caso o cargo não seja reconhecido, redireciona para uma página padrão
+        header("Location: feed_user.php");
+    }
     exit;
 }
 
@@ -17,50 +58,163 @@ if (isset($_POST['alterar_cargo'])) {
     $stmt->execute();
 }
 
+// Excluir usuário
+if (isset($_POST['excluir_usuario'])) {
+    $usuarioIdExcluir = $_POST['usuario_id_excluir'];
+
+    try {
+        $conn->begin_transaction();
+
+        $stmt = $conn->prepare("DELETE FROM comentarios WHERE usuario_id = ?");
+        $stmt->bind_param("i", $usuarioIdExcluir);
+        $stmt->execute();
+
+        $stmt = $conn->prepare("DELETE FROM interacoes WHERE usuario_id = ?");
+        $stmt->bind_param("i", $usuarioIdExcluir);
+        $stmt->execute();
+
+        $publicacoes_usuario = $conn->prepare("SELECT id, foto FROM publicacoes WHERE usuario_id = ?");
+        $publicacoes_usuario->bind_param("i", $usuarioIdExcluir);
+        $publicacoes_usuario->execute();
+        $resultado_publicacoes = $publicacoes_usuario->get_result();
+
+        while ($pub = $resultado_publicacoes->fetch_assoc()) {
+            $stmt = $conn->prepare("DELETE FROM comentarios WHERE publicacao_id = ?");
+            $stmt->bind_param("i", $pub['id']);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("DELETE FROM interacoes WHERE publicacao_id = ?");
+            $stmt->bind_param("i", $pub['id']);
+            $stmt->execute();
+
+            if (!empty($pub['foto']) && file_exists($pub['foto'])) {
+                unlink($pub['foto']);
+            }
+
+            $stmt = $conn->prepare("DELETE FROM publicacoes WHERE id = ?");
+            $stmt->bind_param("i", $pub['id']);
+            $stmt->execute();
+        }
+
+        $atropelamentos_usuario = $conn->prepare("SELECT id, caminho_foto FROM atropelamentos WHERE usuario_id = ?");
+        $atropelamentos_usuario->bind_param("i", $usuarioIdExcluir);
+        $atropelamentos_usuario->execute();
+        $resultado_atropelamentos = $atropelamentos_usuario->get_result();
+
+        while ($atr = $resultado_atropelamentos->fetch_assoc()) {
+            if (!empty($atr['caminho_foto']) && file_exists($atr['caminho_foto'])) {
+                unlink($atr['caminho_foto']);
+            }
+
+            $stmt = $conn->prepare("DELETE FROM atropelamentos WHERE id = ?");
+            $stmt->bind_param("i", $atr['id']);
+            $stmt->execute();
+        }
+
+        $stmt = $conn->prepare("DELETE FROM usuarios WHERE id = ?");
+        $stmt->bind_param("i", $usuarioIdExcluir);
+        $stmt->execute();
+
+        $conn->commit();
+        $_SESSION['mensagem'] = "Usuário excluído com sucesso!";
+        $_SESSION['tipo_mensagem'] = "success";
+
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['mensagem'] = "Erro ao excluir usuário: " . $e->getMessage();
+        $_SESSION['tipo_mensagem'] = "danger";
+    }
+
+    header("Location: admin.php");
+    exit;
+}
+
 // Excluir publicação
 if (isset($_POST['excluir_publicacao'])) {
     $pubId = $_POST['pub_id'];
 
     try {
-        // Inicia transação
         $conn->begin_transaction();
-
-        // 1. Primeiro exclui os comentários relacionados
         $stmt = $conn->prepare("DELETE FROM comentarios WHERE publicacao_id = ?");
         $stmt->bind_param("i", $pubId);
         $stmt->execute();
-
-        // 2. Exclui as interações (likes/dislikes) relacionadas
         $stmt = $conn->prepare("DELETE FROM interacoes WHERE publicacao_id = ?");
         $stmt->bind_param("i", $pubId);
         $stmt->execute();
-
-        // 3. Busca a foto para excluir do servidor
         $busca = $conn->prepare("SELECT foto FROM publicacoes WHERE id = ?");
         $busca->bind_param("i", $pubId);
         $busca->execute();
         $resultado = $busca->get_result();
-
         if ($foto = $resultado->fetch_assoc()) {
             if (file_exists($foto['foto'])) {
                 unlink($foto['foto']);
             }
         }
-
-        // 4. Agora exclui a publicação
         $stmt = $conn->prepare("DELETE FROM publicacoes WHERE id = ?");
         $stmt->bind_param("i", $pubId);
         $stmt->execute();
-
-        // Confirma a transação
         $conn->commit();
-
+        $_SESSION['mensagem'] = "Publicação excluída com sucesso!";
+        $_SESSION['tipo_mensagem'] = "success";
     } catch (Exception $e) {
-        // Em caso de erro, desfaz a transação
         $conn->rollback();
-        die("Erro ao excluir publicação: " . $e->getMessage());
+        $_SESSION['mensagem'] = "Erro ao excluir publicação: " . $e->getMessage();
+        $_SESSION['tipo_mensagem'] = "danger";
     }
+    header("Location: admin.php");
+    exit;
 }
+
+// Excluir atropelamento
+if (isset($_POST['excluir_atropelamento'])) {
+    $atrId = $_POST['atr_id'];
+
+    try {
+        $conn->begin_transaction();
+        $busca = $conn->prepare("SELECT caminho_foto FROM atropelamentos WHERE id = ?");
+        $busca->bind_param("i", $atrId);
+        $busca->execute();
+        $resultado = $busca->get_result();
+        if ($foto = $resultado->fetch_assoc()) {
+            if (!empty($foto['caminho_foto']) && file_exists($foto['caminho_foto'])) {
+                unlink($foto['caminho_foto']);
+            }
+        }
+        $stmt = $conn->prepare("DELETE FROM atropelamentos WHERE id = ?");
+        $stmt->bind_param("i", $atrId);
+        $stmt->execute();
+        $conn->commit();
+        $_SESSION['mensagem'] = "Caso de atropelamento excluído com sucesso!";
+        $_SESSION['tipo_mensagem'] = "success";
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['mensagem'] = "Erro ao excluir atropelamento: " . $e->getMessage();
+        $_SESSION['tipo_mensagem'] = "danger";
+    }
+    header("Location: admin.php");
+    exit;
+}
+
+// Buscar todos os usuários
+$usuarios = $conn->query("SELECT * FROM usuarios");
+
+// Buscar todas as publicações com o nome do usuário
+$publicacoes_query = "
+    SELECT publicacoes.id, publicacoes.especie, publicacoes.foto, usuarios.nome, publicacoes.data_publicacao, NULL as localizacao, 'publicacao' as tipo
+    FROM publicacoes
+    JOIN usuarios ON publicacoes.usuario_id = usuarios.id
+";
+
+// Buscar todos os atropelamentos com o nome do usuário
+$atropelamentos_query = "
+    SELECT atropelamentos.id, atropelamentos.especie, atropelamentos.caminho_foto as foto, usuarios.nome, atropelamentos.data_postagem as data_publicacao, atropelamentos.localizacao, 'atropelamento' as tipo
+    FROM atropelamentos
+    JOIN usuarios ON atropelamentos.usuario_id = usuarios.id
+";
+
+// Unir as duas queries
+$posts_geral_query = "({$publicacoes_query}) UNION ({$atropelamentos_query}) ORDER BY data_publicacao DESC";
+$posts_geral = $conn->query($posts_geral_query);
 ?>
 
 <!DOCTYPE html>
@@ -95,6 +249,8 @@ if (isset($_POST['excluir_publicacao'])) {
         .action-form {
             display: flex;
             justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
         .nav-buttons {
             margin-bottom: 20px;
@@ -108,6 +264,9 @@ if (isset($_POST['excluir_publicacao'])) {
             border-bottom: 2px solid #dee2e6;
             text-align: center;
         }
+        .alert {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -115,50 +274,21 @@ if (isset($_POST['excluir_publicacao'])) {
         <h2 class="text-center mb-4">Painel de Administração</h2>
 
         <div class="nav-buttons">
-            <a href="feed.php" class="btn btn-primary">Feed Geral</a>
+            <a href="feed_user.php" class="btn btn-primary">Feed Geral</a>
             <a href="feed_atropelamentos.php" class="btn btn-info">Atropelamentos</a>
             <a href="logout.php" class="btn btn-danger">Logout</a>
         </div>
 
+        <?php if (isset($_SESSION['mensagem'])): ?>
+            <div class="alert alert-<?= $_SESSION['tipo_mensagem'] ?>" role="alert">
+                <?= $_SESSION['mensagem'] ?>
+            </div>
+            <?php unset($_SESSION['mensagem']); unset($_SESSION['tipo_mensagem']); ?>
+        <?php endif; ?>
+
         <div class="table-container">
             <h4 class="section-title">Gerenciar Usuários</h4>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Cargo</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $usuarios = $conn->query("SELECT * FROM usuarios");
-                        while ($user = $usuarios->fetch_assoc()):
-                        ?>
-                            <tr>
-                                <td><?= $user['id'] ?></td>
-                                <td><?= $user['nome'] ?></td>
-                                <td><?= $user['email'] ?></td>
-                                <td><?= ucfirst($user['cargo']) ?></td>
-                                <td>
-                                    <form method="POST" class="action-form">
-                                        <input type="hidden" name="usuario_id" value="<?= $user['id'] ?>">
-                                        <select name="cargo" class="form-select form-select-sm me-2" style="width: auto;">
-                                            <option value="user" <?= $user['cargo'] === 'user' ? 'selected' : '' ?>>Usuário</option>
-                                            <option value="especialista" <?= $user['cargo'] === 'especialista' ? 'selected' : '' ?>>Especialista</option>
-                                            <option value="admin" <?= $user['cargo'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                                        </select>
-                                        <button type="submit" name="alterar_cargo" class="btn btn-primary btn-sm">Alterar</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
+            <?php include 'tabela_usuarios_admin.php'; ?>
         </div>
 
         <div class="table-container">
@@ -168,6 +298,7 @@ if (isset($_POST['excluir_publicacao'])) {
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
+                            <th>Tipo</th>
                             <th>Espécie</th>
                             <th>Foto</th>
                             <th>Autor</th>
@@ -176,27 +307,28 @@ if (isset($_POST['excluir_publicacao'])) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php
-                        $publicacoes = $conn->query("
-                            SELECT publicacoes.*, usuarios.nome FROM publicacoes
-                            JOIN usuarios ON publicacoes.usuario_id = usuarios.id
-                            ORDER BY publicacoes.data_publicacao DESC
-                        ");
-                        while ($pub = $publicacoes->fetch_assoc()):
-                        ?>
+                        <?php while ($post = $posts_geral->fetch_assoc()): ?>
                             <tr>
-                                <td><?= $pub['id'] ?></td>
-                                <td><?= $pub['especie'] ?></td>
+                                <td><?= $post['id'] ?></td>
+                                <td><?= ucfirst($post['tipo']) ?></td>
+                                <td><?= $post['especie'] ?></td>
                                 <td>
-                                    <img src="<?= $pub['foto'] ?>" alt="foto" class="img-thumbnail">
+                                    <?php if (!empty($post['foto']) && file_exists($post['foto'])): ?>
+                                        <img src="<?= $post['foto'] ?>" alt="foto" class="img-thumbnail" style="max-height: 80px;">
+                                    <?php else: ?>
+                                        Sem foto
+                                    <?php endif; ?>
                                 </td>
-                                <td><?= $pub['nome'] ?></td>
-                                <td><?= date('d/m/Y H:i', strtotime($pub['data_publicacao'])) ?></td>
+                                <td><?= $post['nome'] ?></td>
+                                <td><?= date('d/m/Y H:i', strtotime($post['data_publicacao'])) ?></td>
                                 <td>
-                                    <form method="POST" class="action-form" onsubmit="return confirm('Tem certeza que deseja excluir esta publicação e todos os dados relacionados?')">
-                                        <input type="hidden" name="pub_id" value="<?= $pub['id'] ?>">
-                                        <button type="submit" name="excluir_publicacao" class="btn btn-danger btn-sm">Excluir</button>
-                                    </form>
+                                    <div class="action-form">
+                                        <form method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este item?')">
+                                            <input type="hidden" name="<?php if ($post['tipo'] === 'publicacao'): echo 'pub_id'; else: echo 'atr_id'; endif; ?>" value="<?= $post['id'] ?>">
+                                            <input type="hidden" name="<?php if ($post['tipo'] === 'publicacao'): echo 'excluir_publicacao'; else: echo 'excluir_atropelamento'; endif; ?>" value="true">
+                                            <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
