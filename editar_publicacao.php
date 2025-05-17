@@ -6,6 +6,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <html lang='pt-br'>
     <head>
         <meta charset='UTF-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Acesso Negado</title>
         <style>
             body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -33,6 +34,7 @@ if (!isset($_SESSION['usuario_id'])) {
 include 'conexao.php';
 
 $mensagem = "";
+$publicacao = null;
 
 // Obter o ID da publicação da URL
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
@@ -124,58 +126,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Publicação</title>
-    <link rel="stylesheet" href="css/publicar.css">
-    <style>
-        .current-image {
-            max-width: 300px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/editar_publicacao.css">
+   
 </head>
 <body>
-    <h1>Editar Publicação</h1>
+    <div class="container">
+        <h1>Editar Publicação</h1>
 
-    <?php if ($mensagem): ?>
-        <p><?php echo $mensagem; ?></p>
-        <?php if ($mensagem === "Publicação atualizada com sucesso!"): ?>
-            <a href="feed_user.php"><button>Voltar para o Feed</button></a>
+        <?php if ($mensagem): ?>
+            <p><?php echo $mensagem; ?></p>
+            <?php if ($mensagem === "Publicação atualizada com sucesso!"): ?>
+                <a href="feed_user.php"><button>Voltar para o Feed</button></a>
+            <?php endif; ?>
         <?php endif; ?>
-    <?php endif; ?>
 
-    <?php if (isset($publicacao)): ?>
-        <form method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="publicacao_id" value="<?php echo htmlspecialchars($publicacao['id']); ?>">
+        <?php if (isset($publicacao)): ?>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="publicacao_id" value="<?php echo htmlspecialchars($publicacao['id']); ?>">
 
-            <label>Título:</label><br>
-            <input type="text" name="titulo" value="<?php echo htmlspecialchars($publicacao['titulo']); ?>" required><br><br>
+                <label for="titulo">Título:</label><br>
+                <input type="text" id="titulo" name="titulo" value="<?php echo htmlspecialchars($publicacao['titulo']); ?>" required><br><br>
 
-            <label>Descrição:</label><br>
-            <textarea name="descricao" required><?php echo htmlspecialchars($publicacao['descricao']); ?></textarea><br><br>
+                <label for="descricao">Descrição:</label><br>
+                <textarea id="descricao" name="descricao" required><?php echo htmlspecialchars($publicacao['descricao']); ?></textarea><br><br>
 
-            <div>
-                <label>Foto atual:</label><br>
-                <?php if (!empty($publicacao['caminho_foto'])): ?>
-                    <img src="<?php echo htmlspecialchars($publicacao['caminho_foto']); ?>" alt="Foto atual" class="current-image">
-                <?php else: ?>
-                    <p>Nenhuma foto cadastrada.</p>
-                <?php endif; ?>
-            </div>
+                <div>
+                    <label>Foto atual:</label><br>
+                    <?php if (!empty($publicacao['caminho_foto'])): ?>
+                        <img src="<?php echo htmlspecialchars($publicacao['caminho_foto']); ?>" alt="Foto atual" class="current-image">
+                    <?php else: ?>
+                        <p>Nenhuma foto cadastrada.</p>
+                    <?php endif; ?>
+                </div>
 
-            <label>Alterar foto (opcional):</label><br>
-            <input type="file" name="foto" accept="image/*"><br><br>
+                <label for="foto">Alterar foto (opcional):</label><br>
+                <input type="file" id="foto" name="foto" accept="image/*"><br><br>
 
-            <button type="submit" name="atualizar_publicacao">Salvar Alterações</button>
-            <a href="feed_user.php"><button type="button">Cancelar</button></a>
-        </form>
-    <?php endif; ?>
+                <button type="submit" name="atualizar_publicacao">Salvar Alterações</button>
+                <a href="feed_user.php"><button type="button">Cancelar</button></a>
+            </form>
+        <?php endif; ?>
 
-    <?php if (isset($mensagem) && strpos($mensagem, 'permissão') !== false): ?>
-        <p><a href="feed_user.php"><button>Voltar para o Feed</button></a></p>
-    <?php endif; ?>
+        <?php if (isset($mensagem) && strpos($mensagem, 'permissão') !== false): ?>
+            <p><a href="feed_user.php"><button>Voltar para o Feed</button></a></p>
+        <?php endif; ?>
+    </div>
 </body>
 </html>

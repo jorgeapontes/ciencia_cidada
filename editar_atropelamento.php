@@ -7,6 +7,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <html lang='pt-br'>
     <head>
         <meta charset='UTF-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Acesso Negado</title>
         <style>
             body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -106,19 +107,25 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Atropelamento</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/editar_atropelamento.css">
+    
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Ciência Cidadã</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="home.html">Home</a>
-                <a class="nav-link" href="painel_usuario.php">Painel</a>
-                <a class="nav-link" href="feed_user.php">Feed</a>
-                <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
-                <a class="nav-link" href="publicar.php">Nova Publicação</a>
-                <a class="nav-link" href="logout.php">Sair</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="home.html">Home</a>
+                    <a class="nav-link" href="painel_usuario.php">Painel</a>
+                    <a class="nav-link" href="feed_user.php">Feed</a>
+                    <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                    <a class="nav-link" href="publicar.php">Nova Publicação</a>
+                    <a class="nav-link" href="logout.php">Sair</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -147,7 +154,7 @@ $conn->close();
                 <label for="foto" class="form-label">Foto (deixe em branco para manter a atual)</label>
                 <input type="file" class="form-control" id="foto" name="foto">
                 <?php if (!empty($atropelamento['caminho_foto']) && file_exists($atropelamento['caminho_foto'])): ?>
-                    <img src="<?= htmlspecialchars($atropelamento['caminho_foto']) ?>" alt="Foto atual" style="max-width: 200px; margin-top: 10px;">
+                    <img src="<?= htmlspecialchars($atropelamento['caminho_foto']) ?>" alt="Foto atual" class="img-thumbnail">
                 <?php endif; ?>
             </div>
             <button type="submit" class="btn btn-primary">Salvar Alterações</button>

@@ -12,6 +12,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <html lang='pt-br'>
     <head>
         <meta charset='UTF-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Acesso Negado</title>
         <style>
             body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -60,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("UPDATE usuarios SET senha = ? WHERE email = ?");
             $stmt->bind_param("ss", $senha_hash, $email);
-            
+
             if ($stmt->execute()) {
                 $mensagem = "Senha alterada com sucesso! <a href='login.php'>Faça login</a>";
             } else {
@@ -80,29 +81,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redefinir Senha - Aves Brasil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .reset-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="css/redefinir_senha.css">
+    
 </head>
 <body>
     <div class="container">
         <div class="reset-container">
             <h2 class="text-center mb-4">Redefinir Senha</h2>
-            
+
             <?php if ($mensagem): ?>
                 <div class="alert alert-info"><?= $mensagem ?></div>
             <?php endif; ?>
-            
+
             <form method="POST">
                 <div class="mb-3">
                     <label for="email" class="form-label">Seu Email</label>
@@ -118,13 +108,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Redefinir Senha</button>
             </form>
-            
+
             <div class="mt-3 text-center">
                 <a href="login.php">Voltar para o login</a>
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
     $tipo = filter_input(INPUT_POST, 'tipo', FILTER_SANITIZE_SPECIAL_CHARS);
     $usuario_id = $_SESSION['usuario_id'];
 
-    if ($atropelamento_id && ($tipo === 'like' || $tipo === 'dislike')) {
+    if ($atropelamento_id !== false && ($tipo === 'like' || $tipo === 'dislike')) {
         // Verificar se o usuário já interagiu com este atropelamento
         $stmt_check = $conn->prepare("SELECT id, tipo FROM interacoes_atropelamentos WHERE usuario_id = ? AND atropelamento_id = ?");
         $stmt_check->bind_param("ii", $usuario_id, $atropelamento_id);
@@ -27,18 +27,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
                 // Remover a interação se o usuário clicar no mesmo botão novamente
                 $stmt_delete = $conn->prepare("DELETE FROM interacoes_atropelamentos WHERE id = ?");
                 $stmt_delete->bind_param("i", $interacao_existente['id']);
-                $stmt_delete->execute();
+                if (!$stmt_delete->execute()) {
+                    http_response_code(500); // Internal Server Error
+                    echo json_encode(['erro' => 'Erro ao remover interação: ' . $stmt_delete->error]);
+                    $stmt_delete->close();
+                    $conn->close();
+                    exit;
+                }
+                $stmt_delete->close();
             } else {
                 // Atualizar a interação se o tipo for diferente
                 $stmt_update = $conn->prepare("UPDATE interacoes_atropelamentos SET tipo = ? WHERE id = ?");
                 $stmt_update->bind_param("si", $tipo, $interacao_existente['id']);
-                $stmt_update->execute();
+                if (!$stmt_update->execute()) {
+                    http_response_code(500); // Internal Server Error
+                    echo json_encode(['erro' => 'Erro ao atualizar interação: ' . $stmt_update->error]);
+                    $stmt_update->close();
+                    $conn->close();
+                    exit;
+                }
+                $stmt_update->close();
             }
         } else {
             // Inserir nova interação
             $stmt_insert = $conn->prepare("INSERT INTO interacoes_atropelamentos (usuario_id, atropelamento_id, tipo, data_interacao) VALUES (?, ?, ?, NOW())");
             $stmt_insert->bind_param("iis", $usuario_id, $atropelamento_id, $tipo);
-            $stmt_insert->execute();
+            if (!$stmt_insert->execute()) {
+                http_response_code(500); // Internal Server Error
+                echo json_encode(['erro' => 'Erro ao inserir interação: ' . $stmt_insert->error]);
+                $stmt_insert->close();
+                $conn->close();
+                exit;
+            }
+            $stmt_insert->close();
         }
 
         // Recalcular e retornar os counts de likes e dislikes
@@ -46,17 +67,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
             SELECT
                 (SELECT COUNT(*) FROM interacoes_atropelamentos WHERE atropelamento_id = ? AND tipo = 'like') AS likes,
                 (SELECT COUNT(*) FROM interacoes_atropelamentos WHERE atropelamento_id = ? AND tipo = 'dislike') AS dislikes
+            FROM atropelamentos
+            WHERE id = ?
         ");
-        $stmt_counts->bind_param("ii", $atropelamento_id, $atropelamento_id);
+        $stmt_counts->bind_param("iii", $atropelamento_id, $atropelamento_id, $atropelamento_id);
         $stmt_counts->execute();
         $resultado_counts = $stmt_counts->get_result();
         $counts = $resultado_counts->fetch_assoc();
 
-        echo json_encode(['success' => true, 'likes' => $counts['likes'], 'dislikes' => $counts['dislikes']]);
+        echo json_encode(['success' => true, 'likes' => $counts['likes'] ?? 0, 'dislikes' => $counts['dislikes'] ?? 0]);
 
         $stmt_check->close();
-        $stmt_update->close();
-        $stmt_insert->close();
         $stmt_counts->close();
 
     } else {

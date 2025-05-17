@@ -12,6 +12,7 @@ if (!isset($_SESSION['usuario_id'])) {
     <html lang='pt-br'>
     <head>
         <meta charset='UTF-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Acesso Negado</title>
         <style>
             body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -221,51 +222,99 @@ $posts_geral = $conn->query($posts_geral_query);
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
+            font-family: sans-serif;
         }
         .admin-container {
             max-width: 1200px;
-            margin: 30px auto;
-            padding: 20px;
+            margin: 20px auto;
+            padding: 15px;
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
+        .nav-buttons {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .nav-buttons a {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .section-title {
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #dee2e6;
+            text-align: center;
+        }
         .table-container {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
         }
         .table th, .table td {
             text-align: center;
             vertical-align: middle;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .table th {
+            background-color: #f8f9fa;
         }
         .table img {
             max-height: 60px;
             border-radius: 4px;
+            max-width: 80px;
+            height: auto;
         }
         .action-form {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
+            flex-wrap: wrap;
         }
-        .nav-buttons {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        .section-title {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #dee2e6;
-            text-align: center;
+        .action-form button {
+            flex-grow: 1;
+            margin-bottom: 5px;
         }
         .alert {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                margin: 15px;
+                padding: 10px;
+            }
+            .table th, .table td {
+                padding: 6px;
+                font-size: 0.9em;
+            }
+            .table img {
+                max-height: 40px;
+                max-width: 60px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-buttons a {
+                font-size: 0.9em;
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
@@ -314,7 +363,7 @@ $posts_geral = $conn->query($posts_geral_query);
                                 <td><?= $post['especie'] ?></td>
                                 <td>
                                     <?php if (!empty($post['foto']) && file_exists($post['foto'])): ?>
-                                        <img src="<?= $post['foto'] ?>" alt="foto" class="img-thumbnail" style="max-height: 80px;">
+                                        <img src="<?= $post['foto'] ?>" alt="foto" class="img-thumbnail">
                                     <?php else: ?>
                                         Sem foto
                                     <?php endif; ?>

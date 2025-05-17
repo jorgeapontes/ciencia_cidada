@@ -47,15 +47,19 @@ if (isset($_SESSION['cargo'])) {
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
 
-// Buscar publicações
+// Obter a opção de ordenação da URL (se existir)
+$ordem = $_GET['ordem'] ?? 'DESC'; // DESC por padrão (mais recentes primeiro)
+$ordem_sql = ($ordem === 'ASC') ? 'ASC' : 'DESC';
+
+// Buscar publicações com ordenação
 $stmt = $conn->prepare("
-    SELECT p.*, u.nome, u.id as usuario_id,
-    (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = p.id AND tipo = 'like') AS likes,
-    (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = p.id AND tipo = 'dislike') AS dislikes,
-    (SELECT tipo FROM interacoes WHERE publicacao_id = p.id AND usuario_id = ?) AS minha_interacao
-    FROM publicacoes p
-    JOIN usuarios u ON p.usuario_id = u.id
-    ORDER BY p.id DESC");
+            SELECT p.*, u.nome, u.id as usuario_id,
+            (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = p.id AND tipo = 'like') AS likes,
+            (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = p.id AND tipo = 'dislike') AS dislikes,
+            (SELECT tipo FROM interacoes WHERE publicacao_id = p.id AND usuario_id = ?) AS minha_interacao
+            FROM publicacoes p
+            JOIN usuarios u ON p.usuario_id = u.id
+            ORDER BY p.data_publicacao $ordem_sql");
 $stmt->bind_param("i", $_SESSION['usuario_id']);
 $stmt->execute();
 $resultado = $stmt->get_result();
@@ -80,6 +84,19 @@ $resultado = $stmt->get_result();
         .like-button:hover, .dislike-button:hover {
             cursor: pointer;
         }
+
+        /* Estilos para o seletor de ordenação */
+        .order-select-container {
+            margin-bottom: 1rem;
+            text-align: right;
+        }
+
+        .order-select {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            border: 1px solid #ced4da;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +114,13 @@ $resultado = $stmt->get_result();
     </nav>
 
     <div class="feed-container">
+        <div class="order-select-container">
+            <select class="order-select" onchange="window.location.href='feed_user.php?ordem=' + this.value">
+                <option value="DESC" <?= ($ordem === 'DESC') ? 'selected' : '' ?>>Mais Recentes Primeiro</option>
+                <option value="ASC" <?= ($ordem === 'ASC') ? 'selected' : '' ?>>Mais Antigas Primeiro</option>
+            </select>
+        </div>
+
         <?php while ($pub = $resultado->fetch_assoc()): ?>
             <div class="card">
                 <?php
@@ -145,12 +169,12 @@ $resultado = $stmt->get_result();
                         <h6>Comentários</h6>
                         <?php
                         $stmt_comentarios = $conn->prepare("
-                            SELECT c.*, u.nome, u.cargo
-                            FROM comentarios c
-                            JOIN usuarios u ON c.usuario_id = u.id
-                            WHERE c.publicacao_id = ?
-                            ORDER BY c.data_comentario ASC
-                        ");
+                                SELECT c.*, u.nome, u.cargo
+                                FROM comentarios c
+                                JOIN usuarios u ON c.usuario_id = u.id
+                                WHERE c.publicacao_id = ?
+                                ORDER BY c.data_comentario ASC
+                            ");
                         $stmt_comentarios->bind_param("i", $pub['id']);
                         $stmt_comentarios->execute();
                         $comentarios = $stmt_comentarios->get_result();
@@ -208,31 +232,31 @@ $resultado = $stmt->get_result();
                         },
                         body: `publicacao_id=${encodeURIComponent(publicacaoId)}&tipo=${encodeURIComponent(tipo)}`
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            if (likeCountSpan) likeCountSpan.textContent = data.likes;
-                            if (dislikeCountSpan) dislikeCountSpan.textContent = data.dislikes;
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (likeCountSpan) likeCountSpan.textContent = data.likes;
+                                if (dislikeCountSpan) dislikeCountSpan.textContent = data.dislikes;
 
-                            const likeButton = this.parentNode.querySelector('.like-button[data-publicacao-id="' + publicacaoId + '"]');
-                            const dislikeButton = this.parentNode.querySelector('.dislike-button[data-publicacao-id="' + publicacaoId + '"]');
+                                const likeButton = this.parentNode.querySelector('.like-button[data-publicacao-id="' + publicacaoId + '"]');
+                                const dislikeButton = this.parentNode.querySelector('.dislike-button[data-publicacao-id="' + publicacaoId + '"]');
 
-                            if (tipo === 'like') {
-                                likeButton.classList.add('like-active');
-                                dislikeButton.classList.remove('dislike-active');
-                            } else if (tipo === 'dislike') {
-                                dislikeButton.classList.add('dislike-active');
-                                likeButton.classList.remove('like-active');
+                                if (tipo === 'like') {
+                                    likeButton.classList.add('like-active');
+                                    dislikeButton.classList.remove('dislike-active');
+                                } else if (tipo === 'dislike') {
+                                    dislikeButton.classList.add('dislike-active');
+                                    likeButton.classList.remove('like-active');
+                                }
+                            } else {
+                                alert('Erro ao processar interação.');
+                                console.error(data.erro);
                             }
-                        } else {
-                            alert('Erro ao processar interação.');
-                            console.error(data.erro);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro na requisição:', error);
-                        alert('Ocorreu um erro ao interagir.');
-                    });
+                        })
+                        .catch(error => {
+                            console.error('Erro na requisição:', error);
+                            alert('Ocorreu um erro ao interagir.');
+                        });
                 });
             });
         });

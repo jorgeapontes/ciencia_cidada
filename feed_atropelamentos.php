@@ -31,12 +31,6 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-
-// Se a verificação da sessão passar (o usuario_id está definido),
-// o restante do código da página feed_atropelamentos será executado
-// ... (seu código para exibir o feed de atropelamentos) ...
-
-
 include 'conexao.php';
 
 // Verificar o cargo do usuário para determinar para qual painel redirecionar
@@ -49,11 +43,11 @@ if (isset($_SESSION['cargo'])) {
     }
 }
 
-// Verificar o cargo do usuário atual
-$cargo_usuario = $_SESSION['cargo'] ?? 'user';
-$pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
+// Obter a opção de ordenação da URL (se existir)
+$ordem = $_GET['ordem'] ?? 'DESC'; // DESC por padrão (mais recentes primeiro)
+$ordem_sql = ($ordem === 'ASC') ? 'ASC' : 'DESC';
 
-// Buscar todos os casos de atropelamento
+// Buscar todos os casos de atropelamento com ordenação
 $stmt = $conn->prepare("
     SELECT a.*, u.nome, u.id as usuario_id,
     (SELECT COUNT(*) FROM interacoes_atropelamentos WHERE atropelamento_id = a.id AND tipo = 'like') AS likes,
@@ -61,11 +55,15 @@ $stmt = $conn->prepare("
     (SELECT tipo FROM interacoes_atropelamentos WHERE atropelamento_id = a.id AND usuario_id = ?) AS minha_interacao
     FROM atropelamentos a
     JOIN usuarios u ON a.usuario_id = u.id
-    ORDER BY a.data_postagem DESC
+    ORDER BY a.data_postagem $ordem_sql
 ");
 $stmt->bind_param("i", $_SESSION['usuario_id']);
 $stmt->execute();
 $resultado = $stmt->get_result();
+
+// Verificar o cargo do usuário atual
+$cargo_usuario = $_SESSION['cargo'] ?? 'user';
+$pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
 ?>
 
 <!DOCTYPE html>
@@ -87,6 +85,19 @@ $resultado = $stmt->get_result();
         .like-button:hover, .dislike-button:hover {
             cursor: pointer;
         }
+
+        /* Estilos para o seletor de ordenação */
+        .order-select-container {
+            margin-bottom: 1rem;
+            text-align: right;
+        }
+
+        .order-select {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            border: 1px solid #ced4da;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -106,6 +117,12 @@ $resultado = $stmt->get_result();
 
     <div class="feed-container">
         <h2>Casos de Atropelamento de Animais - Serra do Japi</h2>
+        <div class="order-select-container">
+            <select class="order-select" onchange="window.location.href='feed_atropelamentos.php?ordem=' + this.value">
+                <option value="DESC" <?= ($ordem === 'DESC') ? 'selected' : '' ?>>Mais Recentes Primeiro</option>
+                <option value="ASC" <?= ($ordem === 'ASC') ? 'selected' : '' ?>>Mais Antigas Primeiro</option>
+            </select>
+        </div>
         <?php while ($pub = $resultado->fetch_assoc()): ?>
             <div class="card">
                 <?php
