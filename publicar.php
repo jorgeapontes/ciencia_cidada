@@ -48,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $titulo = $_POST["titulo"];
     $descricao = $_POST["descricao"];
     $atropelamento = $_POST["atropelamento"]; // Recebe '1' ou '0'
+    $categoria = $_POST["categoria"] ?? null; // Nova variável para a categoria
 
     // Processamento do upload da foto
     $caminho_foto = '';
@@ -62,18 +63,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Preparar variáveis para atropelamento
         $localizacao = $_POST['localizacao'] ?? '';
         $especie = $_POST['especie'] ?? '';
-        
+        $data_ocorrencia = $_POST['data_ocorrencia'] ?? null;
+
         // Inserir na tabela de atropelamentos
-        $stmt = $conn->prepare("INSERT INTO atropelamentos (usuario_id, data_ocorrencia, localizacao, especie, descricao, caminho_foto, data_postagem) VALUES (?, NOW(), ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("issss", $_SESSION['usuario_id'], $localizacao, $especie, $descricao, $caminho_foto);
+        $stmt = $conn->prepare("INSERT INTO atropelamentos (usuario_id, data_ocorrencia, localizacao, especie, descricao, caminho_foto, data_postagem, categoria) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?)");
+        $stmt->bind_param("issssss", $_SESSION['usuario_id'], $data_ocorrencia, $localizacao, $especie, $descricao, $caminho_foto, $categoria);
         $tabela_destino = 'feed_atropelamentos.php';
     } else {
         // Preparar variáveis para publicação normal
         $caminho_foto_value = $caminho_foto ?? '';
-        
+
         // Inserir na tabela de publicações (feed geral)
-        $stmt = $conn->prepare("INSERT INTO publicacoes (usuario_id, titulo, descricao, caminho_foto, data_publicacao, atropelamento) VALUES (?, ?, ?, ?, NOW(), ?)");
-        $stmt->bind_param("isssi", $_SESSION['usuario_id'], $titulo, $descricao, $caminho_foto_value, $atropelamento);
+        $stmt = $conn->prepare("INSERT INTO publicacoes (usuario_id, titulo, descricao, caminho_foto, data_publicacao, atropelamento, categoria) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
+        $stmt->bind_param("isssis", $_SESSION['usuario_id'], $titulo, $descricao, $caminho_foto_value, $atropelamento, $categoria);
         $tabela_destino = 'feed_user.php';
     }
 
@@ -107,6 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>
                 <a class="nav-link" href="feed_user.php">Feed</a>
                 <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                <a class="nav-link active" href="publicar.php">Publicar</a>
                 <a class="nav-link" href="logout.php">Sair</a>
             </div>
         </div>
@@ -134,17 +137,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label class="form-check-label" for="atropelamento_sim">Sim</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="atropelamento" id="atropelamento_nao" value="0" required>
+                    <input class="form-check-input" type="radio" name="atropelamento" id="atropelamento_nao" value="0" required checked>
                     <label class="form-check-label" for="atropelamento_nao">Não</label>
                 </div>
             </div>
-            <div class="mb-3" id="campos-atropelamento" style="display: none;">
-                <label for="localizacao" class="form-label">Localização (opcional)</label>
-                <input type="text" class="form-control" id="localizacao" name="localizacao">
+            <div id="campos-atropelamento" style="display: none;">
+                <div class="mb-3">
+                    <label for="localizacao" class="form-label">Localização (opcional)</label>
+                    <input type="text" class="form-control" id="localizacao" name="localizacao">
+                </div>
+                <div class="mb-3">
+                    <label for="especie" class="form-label">Espécie (opcional)</label>
+                    <input type="text" class="form-control" id="especie" name="especie">
+                </div>
+                <div class="mb-3">
+                    <label for="data_ocorrencia" class="form-label">Data e Hora da Ocorrência</label>
+                    <input type="datetime-local" class="form-control" id="data_ocorrencia" name="data_ocorrencia">
+                </div>
             </div>
-            <div class="mb-3" id="campos-especie" style="display: none;">
-                <label for="especie" class="form-label">Espécie (opcional)</label>
-                <input type="text" class="form-control" id="especie" name="especie">
+            <div class="mb-3" id="campos-categoria">
+                <label class="form-label">Categoria da Publicação</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="categoria" id="categoria_animal" value="animal" required>
+                    <label class="form-check-label" for="categoria_animal">Animal</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="categoria" id="categoria_planta" value="planta" required>
+                    <label class="form-check-label" for="categoria_planta">Planta</label>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Publicar</button>
         </form>
@@ -156,14 +176,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.querySelectorAll('input[name="atropelamento"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 const camposAtropelamento = document.getElementById('campos-atropelamento');
-                const camposEspecie = document.getElementById('campos-especie');
-                
+                const camposEspecieAtropelamento = document.getElementById('campos-especie-atropelamento');
+
                 if (this.value === '1') {
                     camposAtropelamento.style.display = 'block';
-                    camposEspecie.style.display = 'block';
+                    camposEspecieAtropelamento.style.display = 'block';
                 } else {
                     camposAtropelamento.style.display = 'none';
-                    camposEspecie.style.display = 'none';
+                    camposEspecieAtropelamento.style.display = 'none';
                 }
             });
         });

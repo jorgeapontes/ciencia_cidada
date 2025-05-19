@@ -33,6 +33,70 @@ if (!isset($_SESSION['usuario_id'])) {
 
 include 'conexao.php';
 
+$usuario_id = $_SESSION['usuario_id'];
+
+// Contagem total de posts (publicações normais + atropelamentos)
+$stmt_total_posts = $conn->prepare("
+    SELECT COUNT(*) AS total FROM (
+        SELECT id FROM publicacoes WHERE usuario_id = ?
+        UNION ALL
+        SELECT id FROM atropelamentos WHERE usuario_id = ?
+    ) AS total_posts
+");
+$stmt_total_posts->bind_param("ii", $usuario_id, $usuario_id);
+$stmt_total_posts->execute();
+$resultado_total_posts = $stmt_total_posts->get_result();
+$total_posts = $resultado_total_posts->fetch_assoc()['total'];
+$stmt_total_posts->close();
+
+// Contagem de espécies distintas nas publicações normais
+$stmt_especies = $conn->prepare("
+    SELECT COUNT(DISTINCT especie) AS total_especies
+    FROM publicacoes
+    WHERE usuario_id = ? AND especie IS NOT NULL AND especie != ''
+");
+$stmt_especies->bind_param("i", $usuario_id);
+$stmt_especies->execute();
+$resultado_especies = $stmt_especies->get_result();
+$total_especies = $resultado_especies->fetch_assoc()['total_especies'];
+$stmt_especies->close();
+
+// Contagem de posts de animais (assumindo que há uma coluna 'categoria' ou similar na tabela 'publicacoes')
+$stmt_animais = $conn->prepare("
+    SELECT COUNT(*) AS total_animais
+    FROM publicacoes
+    WHERE usuario_id = ? AND categoria = 'animal'
+");
+$stmt_animais->bind_param("i", $usuario_id);
+$stmt_animais->execute();
+$resultado_animais = $stmt_animais->get_result();
+$total_animais = $resultado_animais->fetch_assoc()['total_animais'];
+$stmt_animais->close();
+
+// Contagem de posts de plantas (assumindo que há uma coluna 'categoria' ou similar na tabela 'publicacoes')
+$stmt_plantas = $conn->prepare("
+    SELECT COUNT(*) AS total_plantas
+    FROM publicacoes
+    WHERE usuario_id = ? AND categoria = 'planta'
+");
+$stmt_plantas->bind_param("i", $usuario_id);
+$stmt_plantas->execute();
+$resultado_plantas = $stmt_plantas->get_result();
+$total_plantas = $resultado_plantas->fetch_assoc()['total_plantas'];
+$stmt_plantas->close();
+
+// Contagem de casos de atropelamento
+$stmt_atropelamentos_count = $conn->prepare("
+    SELECT COUNT(*) AS total_atropelamentos
+    FROM atropelamentos
+    WHERE usuario_id = ?
+");
+$stmt_atropelamentos_count->bind_param("i", $usuario_id);
+$stmt_atropelamentos_count->execute();
+$resultado_atropelamentos_count = $stmt_atropelamentos_count->get_result();
+$total_atropelamentos = $resultado_atropelamentos_count->fetch_assoc()['total_atropelamentos'];
+$stmt_atropelamentos_count->close();
+
 // Buscar as publicações normais do usuário
 $stmt_publicacoes = $conn->prepare("
     SELECT p.*
@@ -100,6 +164,20 @@ usort($posts, function ($a, $b) {
             display: flex;
             gap: 10px;
         }
+        .user-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .user-stats > div {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .stat-icon {
+            font-size: 1.5em; /* Ajuste o tamanho do ícone conforme necessário */
+        }
     </style>
 </head>
 <body>
@@ -121,6 +199,13 @@ usort($posts, function ($a, $b) {
         <?php if (isset($_SESSION['nome'])): ?>
             <p>Bem-vindo(a), <?= htmlspecialchars($_SESSION['nome']) ?>!</p>
         <?php endif; ?>
+
+        <div class="user-stats">
+            <div><span class="stat-icon">📝</span> <strong>Posts:</strong> <?= $total_posts ?></div>
+            <div><span class="stat-icon">🐾</span> <strong>Animais:</strong> <?= $total_animais ?></div>
+            <div><span class="stat-icon">🌳</span> <strong>Plantas:</strong> <?= $total_plantas ?></div>
+            <div><span class="stat-icon">⚠️</span> <strong>Atropelamentos:</strong> <?= $total_atropelamentos ?></div>
+        </div>
 
         <div class="mb-3">
             <a href="publicar.php" class="btn btn-success">Nova Publicação</a>
@@ -160,10 +245,10 @@ usort($posts, function ($a, $b) {
                     <div class="post-actions">
                         <?php if (isset($post['titulo'])): ?>
                             <a href="editar_publicacao.php?id=<?= $post['id'] ?>" class="btn btn-sm btn-warning">Editar</a>
-                            <a href="delete_publicacao.php?id=<?= $post['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">Excluir</a>
+                            <a href="delete.php?id=<?= $post['id'] ?>&tipo=publicacao" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">Excluir</a>
                         <?php elseif (isset($post['especie'])): ?>
                             <a href="editar_atropelamento.php?id=<?= $post['id'] ?>" class="btn btn-sm btn-warning">Editar</a>
-                            <a href="delete_atropelamento.php?id=<?= $post['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este caso de atropelamento?')">Excluir</a>
+                            <a href="delete.php?id=<?= $post['id'] ?>&tipo=atropelamento" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este caso de atropelamento?')">Excluir</a>
                         <?php endif; ?>
                     </div>
                 </div>
