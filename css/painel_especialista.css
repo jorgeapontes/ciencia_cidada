@@ -74,7 +74,6 @@ p {
     border-color: #0056b3;
 }
 
-/* Estilos específicos para os botões da imagem */
 .btn-success {
     background-color: #28a745;
     border-color: #28a745;
@@ -83,6 +82,18 @@ p {
 .btn-success:hover {
     background-color: #1e7e34;
     border-color: #1c7430;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
 }
 
 .btn-secondary {

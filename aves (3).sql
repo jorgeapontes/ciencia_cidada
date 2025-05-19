@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 17/05/2025 às 05:00
+-- Tempo de geração: 20/05/2025 às 00:25
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -35,15 +35,16 @@ CREATE TABLE `atropelamentos` (
   `especie` varchar(255) DEFAULT NULL,
   `descricao` text DEFAULT NULL,
   `caminho_foto` varchar(255) DEFAULT NULL,
-  `data_postagem` timestamp NOT NULL DEFAULT current_timestamp()
+  `data_postagem` timestamp NOT NULL DEFAULT current_timestamp(),
+  `categoria` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `atropelamentos`
 --
 
-INSERT INTO `atropelamentos` (`id`, `usuario_id`, `data_ocorrencia`, `localizacao`, `especie`, `descricao`, `caminho_foto`, `data_postagem`) VALUES
-(4, 16, '2025-05-16 14:33:33', 'Rua X', '', 'Animal atropelado, encontrado...', 'fotos/682776ed2af16_x.png', '2025-05-16 17:33:33');
+INSERT INTO `atropelamentos` (`id`, `usuario_id`, `data_ocorrencia`, `localizacao`, `especie`, `descricao`, `caminho_foto`, `data_postagem`, `categoria`) VALUES
+(8, 16, '2025-05-19 16:23:00', 'rua x', '', 'Animal encontrado atropelado', 'fotos/682b853091891_x.png', '2025-05-19 19:23:28', 'animal');
 
 -- --------------------------------------------------------
 
@@ -129,15 +130,17 @@ CREATE TABLE `publicacoes` (
   `titulo` varchar(255) DEFAULT NULL,
   `descricao` text DEFAULT NULL,
   `caminho_foto` varchar(255) DEFAULT NULL,
-  `atropelamento` tinyint(1) DEFAULT 0
+  `atropelamento` tinyint(1) DEFAULT 0,
+  `categoria` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `publicacoes`
 --
 
-INSERT INTO `publicacoes` (`id`, `especie`, `foto`, `usuario_id`, `data_publicacao`, `titulo`, `descricao`, `caminho_foto`, `atropelamento`) VALUES
-(23, '', '', 16, '2025-05-16 15:35:54', 'Tucano', 'Pássaro com um bico longo', 'fotos/6827858af016e_tucano.jpg', 0);
+INSERT INTO `publicacoes` (`id`, `especie`, `foto`, `usuario_id`, `data_publicacao`, `titulo`, `descricao`, `caminho_foto`, `atropelamento`, `categoria`) VALUES
+(26, '', '', 16, '2025-05-19 16:21:58', 'Tucano', 'Pássaro com um bico longo', 'fotos/682b84d68a9e1_tucano.jpg', 0, 'animal'),
+(27, '', '', 16, '2025-05-19 16:25:10', 'Ipê Amarelo', 'Arvore bonita', 'fotos/682b8596844bc_ipe amarelo.jpg', 0, 'planta');
 
 -- --------------------------------------------------------
 
@@ -240,7 +243,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de tabela `atropelamentos`
 --
 ALTER TABLE `atropelamentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de tabela `comentarios`
@@ -276,7 +279,7 @@ ALTER TABLE `interacoes_atropelamentos`
 -- AUTO_INCREMENT de tabela `publicacoes`
 --
 ALTER TABLE `publicacoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
