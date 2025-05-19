@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 20/05/2025 às 00:25
+-- Tempo de geração: 20/05/2025 às 01:23
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -140,7 +140,8 @@ CREATE TABLE `publicacoes` (
 
 INSERT INTO `publicacoes` (`id`, `especie`, `foto`, `usuario_id`, `data_publicacao`, `titulo`, `descricao`, `caminho_foto`, `atropelamento`, `categoria`) VALUES
 (26, '', '', 16, '2025-05-19 16:21:58', 'Tucano', 'Pássaro com um bico longo', 'fotos/682b84d68a9e1_tucano.jpg', 0, 'animal'),
-(27, '', '', 16, '2025-05-19 16:25:10', 'Ipê Amarelo', 'Arvore bonita', 'fotos/682b8596844bc_ipe amarelo.jpg', 0, 'planta');
+(27, '', '', 16, '2025-05-19 16:25:10', 'Ipê Amarelo', 'Arvore bonita', 'fotos/682b8596844bc_ipe amarelo.jpg', 0, 'planta'),
+(28, '', '', 12, '2025-05-19 20:18:17', 'Bem-Te-Vi', 'Testando post como especialista', 'fotos/682bbc3980fb0_download.jpeg', 0, 'animal');
 
 -- --------------------------------------------------------
 
@@ -279,7 +280,7 @@ ALTER TABLE `interacoes_atropelamentos`
 -- AUTO_INCREMENT de tabela `publicacoes`
 --
 ALTER TABLE `publicacoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`

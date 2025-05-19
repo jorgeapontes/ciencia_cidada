@@ -33,8 +33,8 @@ if (!isset($_SESSION['usuario_id'])) {
 
 include 'conexao.php';
 
-// Verificar o cargo do usuário para determinar para qual painel redirecionar
-$painel_voltar = 'painel_usuario.php'; // Padrão para usuários normais
+// Verifica o cargo para determinar para qual painel ir
+$painel_voltar = 'painel_usuario.php'; 
 if (isset($_SESSION['cargo'])) {
     if ($_SESSION['cargo'] === 'admin') {
         $painel_voltar = 'admin.php';
@@ -43,8 +43,7 @@ if (isset($_SESSION['cargo'])) {
     }
 }
 
-// Obter a opção de ordenação da URL (se existir)
-$ordem = $_GET['ordem'] ?? 'DESC'; // DESC por padrão (mais recentes primeiro)
+$ordem = $_GET['ordem'] ?? 'DESC'; 
 $ordem_sql = ($ordem === 'ASC') ? 'ASC' : 'DESC';
 
 // Buscar todos os casos de atropelamento com ordenação
@@ -61,7 +60,7 @@ $stmt->bind_param("i", $_SESSION['usuario_id']);
 $stmt->execute();
 $resultado = $stmt->get_result();
 
-// Verificar o cargo do usuário atual
+// Verificar o cargo do usuário 
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
 ?>
@@ -86,7 +85,6 @@ $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admi
             cursor: pointer;
         }
 
-        /* Estilos para o seletor de ordenação */
         .order-select-container {
             margin-bottom: 1rem;
             text-align: right;
@@ -103,7 +101,7 @@ $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admi
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Ciência Cidadã</a>
+            <a class="navbar-brand" href="#">JapiWiki</a>
             <div class="navbar-nav">
                 <a class="nav-link" href="home.html">Home</a>
                 <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>
@@ -233,7 +231,7 @@ $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admi
                     const dislikeCountSpan = document.querySelector('.dislike-count-' + publicacaoId);
                     const icone = this.querySelector('i');
 
-                    fetch('interacao_atropelamento.php', { // Crie este novo arquivo para interações de atropelamentos
+                    fetch('interacao_atropelamento.php', { 
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',

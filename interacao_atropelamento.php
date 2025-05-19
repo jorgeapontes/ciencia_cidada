@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION["usuario_id"])) {
-    http_response_code(403); // Forbidden
+    http_response_code(403); 
     echo json_encode(['erro' => 'Usuário não autenticado.']);
     exit;
 }
@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
     $usuario_id = $_SESSION['usuario_id'];
 
     if ($atropelamento_id !== false && ($tipo === 'like' || $tipo === 'dislike')) {
-        // Verificar se o usuário já interagiu com este atropelamento
+        // Verifica se o usuário já interagiu com este post
         $stmt_check = $conn->prepare("SELECT id, tipo FROM interacoes_atropelamentos WHERE usuario_id = ? AND atropelamento_id = ?");
         $stmt_check->bind_param("ii", $usuario_id, $atropelamento_id);
         $stmt_check->execute();
@@ -24,11 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
         if ($resultado_check->num_rows > 0) {
             $interacao_existente = $resultado_check->fetch_assoc();
             if ($interacao_existente['tipo'] === $tipo) {
-                // Remover a interação se o usuário clicar no mesmo botão novamente
                 $stmt_delete = $conn->prepare("DELETE FROM interacoes_atropelamentos WHERE id = ?");
                 $stmt_delete->bind_param("i", $interacao_existente['id']);
                 if (!$stmt_delete->execute()) {
-                    http_response_code(500); // Internal Server Error
+                    http_response_code(500); 
                     echo json_encode(['erro' => 'Erro ao remover interação: ' . $stmt_delete->error]);
                     $stmt_delete->close();
                     $conn->close();
@@ -36,11 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
                 }
                 $stmt_delete->close();
             } else {
-                // Atualizar a interação se o tipo for diferente
                 $stmt_update = $conn->prepare("UPDATE interacoes_atropelamentos SET tipo = ? WHERE id = ?");
                 $stmt_update->bind_param("si", $tipo, $interacao_existente['id']);
                 if (!$stmt_update->execute()) {
-                    http_response_code(500); // Internal Server Error
+                    http_response_code(500); 
                     echo json_encode(['erro' => 'Erro ao atualizar interação: ' . $stmt_update->error]);
                     $stmt_update->close();
                     $conn->close();
@@ -49,11 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
                 $stmt_update->close();
             }
         } else {
-            // Inserir nova interação
             $stmt_insert = $conn->prepare("INSERT INTO interacoes_atropelamentos (usuario_id, atropelamento_id, tipo, data_interacao) VALUES (?, ?, ?, NOW())");
             $stmt_insert->bind_param("iis", $usuario_id, $atropelamento_id, $tipo);
             if (!$stmt_insert->execute()) {
-                http_response_code(500); // Internal Server Error
+                http_response_code(500);
                 echo json_encode(['erro' => 'Erro ao inserir interação: ' . $stmt_insert->error]);
                 $stmt_insert->close();
                 $conn->close();
@@ -62,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
             $stmt_insert->close();
         }
 
-        // Recalcular e retornar os counts de likes e dislikes
         $stmt_counts = $conn->prepare("
             SELECT
                 (SELECT COUNT(*) FROM interacoes_atropelamentos WHERE atropelamento_id = ? AND tipo = 'like') AS likes,
@@ -81,13 +77,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
         $stmt_counts->close();
 
     } else {
-        http_response_code(400); // Bad Request
+        http_response_code(400);
         echo json_encode(['erro' => 'ID de atropelamento ou tipo de interação inválido.']);
     }
 
     $conn->close();
 } else {
-    http_response_code(400); // Bad Request
+    http_response_code(400); 
     echo json_encode(['erro' => 'Requisição inválida.']);
 }
 ?>

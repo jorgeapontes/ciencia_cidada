@@ -34,7 +34,7 @@ if (!isset($_SESSION['usuario_id'])) {
 include 'conexao.php';
 
 // Verificar o cargo do usuário para determinar para qual painel redirecionar
-$painel_voltar = 'painel_usuario.php'; // Padrão para usuários normais
+$painel_voltar = 'painel_usuario.php'; 
 if (isset($_SESSION['cargo'])) {
     if ($_SESSION['cargo'] === 'admin') {
         $painel_voltar = 'admin.php';
@@ -47,11 +47,10 @@ if (isset($_SESSION['cargo'])) {
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
 
-// Obter a opção de ordenação da URL (se existir)
-$ordem = $_GET['ordem'] ?? 'DESC'; // DESC por padrão (mais recentes primeiro)
+
+$ordem = $_GET['ordem'] ?? 'DESC'; 
 $ordem_sql = ($ordem === 'ASC') ? 'ASC' : 'DESC';
 
-// Buscar publicações com ordenação
 $stmt = $conn->prepare("
             SELECT p.*, u.nome, u.id as usuario_id,
             (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = p.id AND tipo = 'like') AS likes,
@@ -76,16 +75,15 @@ $resultado = $stmt->get_result();
     <link rel="stylesheet" href="css/feed.css">
     <style>
         .like-active {
-            color: blue !important; /* Cor para indicar que o usuário curtiu */
+            color: blue !important; 
         }
         .dislike-active {
-            color: red !important; /* Cor para indicar que o usuário descurtiu */
+            color: red !important; 
         }
         .like-button:hover, .dislike-button:hover {
             cursor: pointer;
         }
 
-        /* Estilos para o seletor de ordenação */
         .order-select-container {
             margin-bottom: 1rem;
             text-align: right;
@@ -102,7 +100,7 @@ $resultado = $stmt->get_result();
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Ciência Cidadã</a>
+            <a class="navbar-brand" href="#">JapiWiki</a>
             <div class="navbar-nav">
                 <a class="nav-link" href="home.html">Home</a>
                 <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>

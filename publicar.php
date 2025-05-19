@@ -103,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Ciência Cidadã</a>
+            <a class="navbar-brand" href="#">JapiWiki</a>
             <div class="navbar-nav">
                 <a class="nav-link" href="home.html">Home</a>
                 <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>

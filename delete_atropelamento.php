@@ -37,20 +37,16 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $atropelamento_id = $_GET['id'];
 
     try {
-        // Inicia transação para garantir a integridade dos dados
         $conn->begin_transaction();
 
-        // 1. Excluir comentários relacionados
         $stmt_comentarios = $conn->prepare("DELETE FROM comentarios_atropelamentos WHERE atropelamento_id = ?");
         $stmt_comentarios->bind_param("i", $atropelamento_id);
         $stmt_comentarios->execute();
 
-        // 2. Excluir interações (likes/dislikes) relacionadas
         $stmt_interacoes = $conn->prepare("DELETE FROM interacoes_atropelamentos WHERE atropelamento_id = ?");
         $stmt_interacoes->bind_param("i", $atropelamento_id);
         $stmt_interacoes->execute();
 
-        // 3. Buscar o caminho da foto para excluir do servidor
         $stmt_select = $conn->prepare("SELECT caminho_foto FROM atropelamentos WHERE id = ?");
         $stmt_select->bind_param("i", $atropelamento_id);
         $stmt_select->execute();
@@ -62,12 +58,10 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             }
         }
 
-        // 4. Excluir o registro de atropelamento
         $stmt_delete = $conn->prepare("DELETE FROM atropelamentos WHERE id = ?");
         $stmt_delete->bind_param("i", $atropelamento_id);
         $stmt_delete->execute();
 
-        // Confirma a transação
         $conn->commit();
 
         $_SESSION['mensagem'] = "Caso de atropelamento excluído com sucesso!";
@@ -76,7 +70,6 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         exit;
 
     } catch (Exception $e) {
-        // Em caso de erro, desfaz a transação
         $conn->rollback();
         $_SESSION['mensagem'] = "Erro ao excluir caso de atropelamento: " . $e->getMessage();
         $_SESSION['tipo_mensagem'] = "danger";

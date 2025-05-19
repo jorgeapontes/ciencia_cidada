@@ -8,10 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $senha = password_hash($_POST["senha"], PASSWORD_DEFAULT);
 
-    // Define cargo padrão como 'user' (não permite selecionar admin no formulário público)
     $cargo = ($_POST["cargo"] == 'especialista') ? 'especialista' : 'user';
 
-    // Verifica email duplicado
+    // Verifica se o email é duplicado
     $stmt_check = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
     $stmt_check->bind_param("s", $email);
     $stmt_check->execute();

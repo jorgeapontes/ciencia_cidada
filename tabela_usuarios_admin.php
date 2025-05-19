@@ -11,7 +11,6 @@
         </thead>
         <tbody>
             <?php
-            // Certifique-se de que a conexão com o banco de dados ($conn) esteja disponível aqui
             if (!isset($conn)) {
                 include 'conexao.php';
             }

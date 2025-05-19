@@ -18,21 +18,19 @@ if (!$publicacao_id || !in_array($tipo, ['like', 'dislike'])) {
 }
 
 try {
-    // Remove qualquer interação existente do usuário nesta publicação
+
     $conn->begin_transaction();
 
     $stmt_delete = $conn->prepare("DELETE FROM interacoes WHERE publicacao_id = ? AND usuario_id = ?");
     $stmt_delete->bind_param("ii", $publicacao_id, $_SESSION['usuario_id']);
     $stmt_delete->execute();
 
-    // Adiciona a nova interação
     $stmt_insert = $conn->prepare("INSERT INTO interacoes (publicacao_id, usuario_id, tipo) VALUES (?, ?, ?)");
     $stmt_insert->bind_param("iis", $publicacao_id, $_SESSION['usuario_id'], $tipo);
     $stmt_insert->execute();
 
     $conn->commit();
 
-    // Obtém as contagens atualizadas
     $stmt_likes = $conn->prepare("SELECT COUNT(*) FROM interacoes WHERE publicacao_id = ? AND tipo = 'like'");
     $stmt_likes->bind_param("i", $publicacao_id);
     $stmt_likes->execute();

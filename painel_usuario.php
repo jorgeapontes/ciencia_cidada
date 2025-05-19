@@ -176,14 +176,14 @@ usort($posts, function ($a, $b) {
             align-items: center;
         }
         .stat-icon {
-            font-size: 1.5em; /* Ajuste o tamanho do ícone conforme necessário */
+            font-size: 1.5em; 
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Ciência Cidadã</a>
+            <a class="navbar-brand" href="#">JapiWiki</a>
             <div class="navbar-nav">
                 <a class="nav-link active" href="painel_usuario.php">Painel</a>
                 <a class="nav-link" href="feed_user.php">Ver Feed</a>
@@ -210,7 +210,7 @@ usort($posts, function ($a, $b) {
         <div class="mb-3">
             <a href="publicar.php" class="btn btn-success">Nova Publicação</a>
             <a href="feed_user.php" class="btn btn-primary">Ver Feed</a>
-            <a href="feed_atropelamentos.php" class="btn btn-info">Atropelamentos</a>
+            <a href="feed_atropelamentos.php" class="btn btn-primary">Atropelamentos</a>
             <a href="logout.php" class="btn btn-danger">Sair</a>
         </div>
 

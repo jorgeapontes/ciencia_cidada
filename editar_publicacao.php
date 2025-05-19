@@ -36,11 +36,11 @@ include 'conexao.php';
 $mensagem = "";
 $publicacao = null;
 
-// Obter o ID da publicação da URL
+// pega o ID da publicação pela URL
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $publicacao_id = $_GET['id'];
 
-    // Verificar se a publicação pertence ao usuário logado
+    // Ve se a publicação pertence ao usuário logado
     $stmt = $conn->prepare("SELECT * FROM publicacoes WHERE id = ? AND usuario_id = ?");
     $stmt->bind_param("ii", $publicacao_id, $_SESSION['usuario_id']);
     $stmt->execute();
@@ -55,15 +55,14 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $mensagem = "ID da publicação inválido.";
 }
 
-// Processar a atualização da publicação
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'])) {
     $titulo = $_POST['titulo'];
     $descricao = $_POST['descricao'];
     $publicacao_id = $_POST['publicacao_id'];
     $atualizar_foto = false;
-    $caminho_foto = $publicacao['caminho_foto']; // Mantém o caminho da foto antiga por padrão
+    $caminho_foto = $publicacao['caminho_foto']; 
 
-    // Verificar novamente se a publicação pertence ao usuário logado (segurança extra)
+    // checar novamente se a publicação pertence ao usuário 
     $stmt_check = $conn->prepare("SELECT id, caminho_foto FROM publicacoes WHERE id = ? AND usuario_id = ?");
     $stmt_check->bind_param("ii", $publicacao_id, $_SESSION['usuario_id']);
     $stmt_check->execute();
@@ -72,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'
     $stmt_check->close();
 
     if ($publicacao_check) {
-        // Processar nova foto, se enviada
         if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
             $foto_temp = $_FILES['foto']['tmp_name'];
             $foto_nome = uniqid() . "_" . $_FILES['foto']['name'];
@@ -80,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'
             $caminho_nova_foto = $pasta . $foto_nome;
 
             if (move_uploaded_file($foto_temp, __DIR__ . '/' . $caminho_nova_foto)) {
-                // Excluir a foto antiga, se existir
                 if (!empty($publicacao_check['caminho_foto']) && file_exists(__DIR__ . '/' . $publicacao_check['caminho_foto'])) {
                     unlink(__DIR__ . '/' . $publicacao_check['caminho_foto']);
                 }
@@ -91,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'
             }
         }
 
-        // Atualizar os dados da publicação (incluindo o caminho da foto se uma nova foi enviada)
+        // Att os dados da publicação 
         $sql_atualizar = "UPDATE publicacoes SET titulo = ?, descricao = ?";
         if ($atualizar_foto) {
             $sql_atualizar .= ", caminho_foto = ?";
@@ -107,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'
 
         if ($stmt_atualizar->execute()) {
             $mensagem = "Publicação atualizada com sucesso!";
-            // Recarregar os dados da publicação para exibir a nova imagem, se houver
             $stmt_reload = $conn->prepare("SELECT * FROM publicacoes WHERE id = ?");
             $stmt_reload->bind_param("i", $publicacao_id);
             $stmt_reload->execute();

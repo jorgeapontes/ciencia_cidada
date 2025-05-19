@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Barra de navegação -->
     <nav class="navbar">
         <a href="#" class="logo">JapiWiki</a>
         <div class="nav-links">
@@ -16,7 +15,6 @@
         </div>
     </nav>
 
-    <!-- Conteúdo principal -->
     <main class="main-content">
         <div class="welcome-text">
             <h1>Bem-vindo ao JapiWiki</h1>
@@ -27,7 +25,6 @@
         </div>
     </main>
 
-    <!-- Modal de aviso -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -39,11 +36,8 @@
     </div>
 
     <script>
-        // Verificar login ao clicar em Ver Publicações
         document.getElementById('verPublicacoes').addEventListener('click', function() {
-            // Verificar se o usuário está logado (simplificado - na prática verifique com PHP/sessão)
-            // Aqui é apenas um exemplo - você precisará implementar a verificação real no redirecionamento
-            const isLoggedIn = false; // Isso deve ser verificado com PHP na prática
+            const isLoggedIn = false; 
             
             if(isLoggedIn) {
                 window.location.href = 'feed.php';
@@ -52,12 +46,10 @@
             }
         });
 
-        // Fechar modal
         document.querySelector('.close-modal').addEventListener('click', function() {
             document.getElementById('loginModal').style.display = 'none';
         });
 
-        // Fechar modal ao clicar fora
         window.addEventListener('click', function(event) {
             if (event.target === document.getElementById('loginModal')) {
                 document.getElementById('loginModal').style.display = 'none';

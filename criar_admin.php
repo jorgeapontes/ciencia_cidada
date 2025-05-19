@@ -40,9 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = $_POST["nome"];
     $email = $_POST["email"];
     $senha = $_POST["senha"];
-    $cargo = "admin"; // Força o cargo como admin
+    $cargo = "admin"; 
 
-    // Verifica se o e-mail já existe
     $stmt_check = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
     $stmt_check->bind_param("s", $email);
     $stmt_check->execute();
@@ -51,10 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt_check->num_rows > 0) {
         $erro = "Este e-mail já está cadastrado!";
     } else {
-        // Gera o hash da senha
         $senha_hash = password_hash($senha, PASSWORD_BCRYPT);
 
-        // Insere no banco
         $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, senha, cargo) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $nome, $email, $senha_hash, $cargo);
 
@@ -115,7 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
         }
 
-        /* Media Queries para telas menores */
         @media (max-width: 576px) {
             .container {
                 margin-top: 20px;

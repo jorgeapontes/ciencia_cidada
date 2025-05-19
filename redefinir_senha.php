@@ -57,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $stmt->get_result();
 
         if ($result->num_rows === 1) {
-            // Atualizar a senha
             $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("UPDATE usuarios SET senha = ? WHERE email = ?");
             $stmt->bind_param("ss", $senha_hash, $email);

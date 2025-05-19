@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-include 'conexao.php'; // Certifique-se que este arquivo existe
+include 'conexao.php'; 
 
 $erro = '';
 
@@ -12,7 +12,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $senha = $_POST["senha"];
 
-    // Prepara a consulta SQL
     $stmt = $conn->prepare("SELECT id, nome, senha, cargo FROM usuarios WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -21,7 +20,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows === 1) {
         $usuario = $result->fetch_assoc();
 
-        // Verifica a senha
         if (password_verify($senha, $usuario['senha'])) {
             $_SESSION["usuario_id"] = $usuario['id'];
             $_SESSION["nome"] = $usuario['nome'];

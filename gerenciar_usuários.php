@@ -32,7 +32,6 @@ if (!isset($_SESSION['usuario_id'])) {
 
 include 'conexao.php';
 
-// Busca todos os usuários
 $sql = "SELECT id, nome, email, cargo FROM usuarios";
 $result = $conn->query($sql);
 ?>

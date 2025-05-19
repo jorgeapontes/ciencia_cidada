@@ -37,20 +37,19 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-// Verifica se é admin
+// Verificar se é admin
 if ($_SESSION['cargo'] !== 'admin') {
     if ($_SESSION['cargo'] === 'especialista') {
         header("Location: painel_especialista.php");
     } elseif ($_SESSION['cargo'] === 'user') {
         header("Location: painel_usuario.php");
     } else {
-        // Caso o cargo não seja reconhecido, redireciona para uma página padrão
         header("Location: feed_user.php");
     }
     exit;
 }
 
-// Alterar cargo
+// para alterar o cargo
 if (isset($_POST['alterar_cargo'])) {
     $novoCargo = $_POST['cargo'];
     $usuarioId = $_POST['usuario_id'];
@@ -59,7 +58,7 @@ if (isset($_POST['alterar_cargo'])) {
     $stmt->execute();
 }
 
-// Excluir usuário
+// para excluir usuário
 if (isset($_POST['excluir_usuario'])) {
     $usuarioIdExcluir = $_POST['usuario_id_excluir'];
 

@@ -34,32 +34,28 @@ if (!isset($_SESSION['usuario_id'])) {
 
 include 'conexao.php';
 
-// Verificar se o ID do atropelamento foi passado pela URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['mensagem'] = "ID de atropelamento inválido.";
     $_SESSION['tipo_mensagem'] = "danger";
-    header("Location: painel_usuario.php"); // Ou onde você lista os atropelamentos
+    header("Location: painel_usuario.php"); 
     exit;
 }
 
 $atropelamento_id = $_GET['id'];
 
-// Buscar os dados do atropelamento para preencher o formulário
 $stmt = $conn->prepare("SELECT * FROM atropelamentos WHERE id = ? AND usuario_id = ?");
 $stmt->bind_param("ii", $atropelamento_id, $_SESSION['usuario_id']);
 $stmt->execute();
 $resultado = $stmt->get_result();
 $atropelamento = $resultado->fetch_assoc();
 
-// Se o atropelamento não for encontrado ou não pertencer ao usuário logado
 if (!$atropelamento) {
     $_SESSION['mensagem'] = "Caso de atropelamento não encontrado ou você não tem permissão para editar.";
     $_SESSION['tipo_mensagem'] = "warning";
-    header("Location: painel_usuario.php"); // Ou onde você lista os atropelamentos
+    header("Location: painel_usuario.php"); 
     exit;
 }
 
-// Processar o formulário de edição quando for submetido
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $especie = $_POST["especie"];
     $descricao = $_POST["descricao"];
@@ -67,9 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data_ocorrencia = $_POST["data_ocorrencia"];
 
     // Processamento do upload da nova foto (opcional)
-    $caminho_foto = $atropelamento['caminho_foto']; // Mantém a foto antiga por padrão
+    $caminho_foto = $atropelamento['caminho_foto']; 
     if (isset($_FILES["foto"]) && $_FILES["foto"]["error"] == 0) {
-        // Lógica para excluir a foto antiga se existir
         if (!empty($caminho_foto) && file_exists($caminho_foto)) {
             unlink($caminho_foto);
         }
@@ -79,14 +74,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         move_uploaded_file($_FILES["foto"]["tmp_name"], $caminho_foto);
     }
 
-    // Preparar e executar a query de atualização
     $stmt_update = $conn->prepare("UPDATE atropelamentos SET especie = ?, descricao = ?, localizacao = ?, data_ocorrencia = ?, caminho_foto = ? WHERE id = ?");
     $stmt_update->bind_param("sssssi", $especie, $descricao, $localizacao, $data_ocorrencia, $caminho_foto, $atropelamento_id);
 
     if ($stmt_update->execute()) {
         $_SESSION['mensagem'] = "Caso de atropelamento atualizado com sucesso!";
         $_SESSION['tipo_mensagem'] = "success";
-        header("Location: painel_usuario.php"); // Redirecionar de volta ao painel
+        header("Location: painel_usuario.php"); 
         exit;
     } else {
         $_SESSION['mensagem'] = "Erro ao atualizar o caso de atropelamento: " . $stmt_update->error;

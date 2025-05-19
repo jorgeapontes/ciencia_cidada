@@ -38,7 +38,6 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && isset($_GET['tipo'])) {
 
     try {
         if ($tipo_post === 'publicacao') {
-            // Deletar publicação da tabela 'publicacoes'
             $stmt_check = $conn->prepare("SELECT usuario_id, caminho_foto FROM publicacoes WHERE id = ?");
             $stmt_check->bind_param("i", $id_para_excluir);
             $stmt_check->execute();
@@ -54,12 +53,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && isset($_GET['tipo'])) {
                     $stmt_delete_comentarios->bind_param("i", $id_para_excluir);
                     $stmt_delete_comentarios->execute();
 
-                    // Excluir interações relacionadas
                     $stmt_delete_interacoes = $conn->prepare("DELETE FROM interacoes WHERE publicacao_id = ?");
                     $stmt_delete_interacoes->bind_param("i", $id_para_excluir);
                     $stmt_delete_interacoes->execute();
 
-                    // Excluir a imagem do servidor
+                    // Excluir imagem 
                     if (!empty($publicacao['caminho_foto']) && file_exists($publicacao['caminho_foto'])) {
                         unlink($publicacao['caminho_foto']);
                     }
@@ -90,7 +88,6 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && isset($_GET['tipo'])) {
             if ($result_check_atropelamento->num_rows === 1) {
                 $atropelamento = $result_check_atropelamento->fetch_assoc();
                 if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $atropelamento['usuario_id']) {
-                    // Excluir a imagem do servidor (se houver)
                     if (!empty($atropelamento['caminho_foto']) && file_exists($atropelamento['caminho_foto'])) {
                         unlink($atropelamento['caminho_foto']);
                     }
@@ -118,7 +115,6 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && isset($_GET['tipo'])) {
         die("Erro ao excluir: " . $e->getMessage());
     }
 } elseif (isset($_GET['comentario_id'])) {
-    // Lógica para deletar comentários (como estava antes)
     $comentario_id = $_GET['comentario_id'];
 
     $stmt = $conn->prepare("SELECT usuario_id FROM comentarios WHERE id = ?");
