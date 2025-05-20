@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'conexao.php'; 
 
 if (!isset($_SESSION['usuario_id'])) {
     $html = <<<HTML
@@ -31,9 +32,38 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-include 'conexao.php';
 
-// Verificar o cargo do usuário para determinar para qual painel redirecionar
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'adicionar_comentario') {
+    $publicacao_id = $_POST['publicacao_id'] ?? null;
+    $comentario_texto = $_POST['comentario'] ?? null;
+    $usuario_id = $_SESSION['usuario_id'];
+    $cargo_usuario = $_SESSION['cargo'] ?? 'user';
+    $tipo_publicacao = 'publicacao'; 
+
+    if (!($cargo_usuario === 'especialista' || $cargo_usuario === 'admin')) {
+        $_SESSION['mensagem'] = "Seu cargo não permite adicionar comentários.";
+        $_SESSION['tipo_mensagem'] = "warning";
+    } elseif ($publicacao_id && $comentario_texto) {
+        $stmt_insert_comentario = $conn->prepare("INSERT INTO comentarios (publicacao_id, usuario_id, comentario, data_comentario, tipo_publicacao) VALUES (?, ?, ?, NOW(), ?)");
+        $stmt_insert_comentario->bind_param("iiss", $publicacao_id, $usuario_id, $comentario_texto, $tipo_publicacao);
+
+        if ($stmt_insert_comentario->execute()) {
+            $_SESSION['mensagem'] = "Comentário adicionado com sucesso!";
+            $_SESSION['tipo_mensagem'] = "success";
+        } else {
+            $_SESSION['mensagem'] = "Erro ao adicionar comentário: " . $conn->error;
+            $_SESSION['tipo_mensagem'] = "danger";
+        }
+        $stmt_insert_comentario->close();
+    } else {
+        $_SESSION['mensagem'] = "Dados inválidos para o comentário.";
+        $_SESSION['tipo_mensagem'] = "danger";
+    }
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+    exit();
+}
+
+
 $painel_voltar = 'painel_usuario.php';
 if (isset($_SESSION['cargo'])) {
     if ($_SESSION['cargo'] === 'admin') {
@@ -43,9 +73,10 @@ if (isset($_SESSION['cargo'])) {
     }
 }
 
-// Verificar o cargo do usuário atual
+
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
+$pode_comentar = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin');
 
 $ordem = $_GET['ordem'] ?? 'DESC';
 $ordem_sql = ($ordem === 'ASC') ? 'ASC' : 'DESC';
@@ -129,6 +160,15 @@ $resultado = $stmt->get_result();
             background-color: #007bff;
             border-color: #007bff;
         }
+        
+        .btn-edit {
+            background-color:rgb(7, 143, 255); 
+            color: white;
+            border: none;
+        }
+        .btn-edit:hover {
+            background-color:rgb(0, 146, 224);
+        }
     </style>
 </head>
 <body>
@@ -146,6 +186,13 @@ $resultado = $stmt->get_result();
     </nav>
 
     <div class="feed-container">
+        <?php if (isset($_SESSION['mensagem'])): ?>
+            <div class="alert alert-<?= $_SESSION['tipo_mensagem'] ?>">
+                <?= $_SESSION['mensagem'] ?>
+            </div>
+            <?php unset($_SESSION['mensagem']); unset($_SESSION['tipo_mensagem']); ?>
+        <?php endif; ?>
+
         <div class="order-filter-container">
             <div class="order-select-container">
                 <select class="order-select" onchange="window.location.href='feed_user.php?ordem=' + this.value + '&filtro=<?= $filtro ?>'">
@@ -197,7 +244,7 @@ $resultado = $stmt->get_result();
                         </div>
 
                         <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $pub['usuario_id']): ?>
-                            <a href="delete.php?id=<?= $pub['id'] ?>" class="btn btn-danger btn-sm ms-auto"
+                            <a href="delete.php?id=<?= $pub['id'] ?>&tipo=publicacao" class="btn btn-danger btn-sm ms-auto"
                                onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">
                                 Excluir
                             </a>
@@ -208,12 +255,12 @@ $resultado = $stmt->get_result();
                         <h6>Comentários</h6>
                         <?php
                         $stmt_comentarios = $conn->prepare("
-                                    SELECT c.*, u.nome, u.cargo
-                                    FROM comentarios c
-                                    JOIN usuarios u ON c.usuario_id = u.id
-                                    WHERE c.publicacao_id = ?
-                                    ORDER BY c.data_comentario ASC
-                                ");
+                                                        SELECT c.*, u.nome, u.cargo
+                                                        FROM comentarios c
+                                                        JOIN usuarios u ON c.usuario_id = u.id
+                                                        WHERE c.publicacao_id = ? AND c.tipo_publicacao = 'publicacao'
+                                                        ORDER BY c.data_comentario ASC
+                                                     ");
                         $stmt_comentarios->bind_param("i", $pub['id']);
                         $stmt_comentarios->execute();
                         $comentarios = $stmt_comentarios->get_result();
@@ -235,12 +282,28 @@ $resultado = $stmt->get_result();
                                     <p class="comentario-text">
                                         <?= nl2br(htmlspecialchars($comentario['comentario'])) ?>
                                     </p>
+                                    <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $comentario['usuario_id']): ?>
+                                        <a href="editar_comentario.php?comentario_id=<?= $comentario['id'] ?>&tipo_publicacao=publicacao" class="btn btn-edit btn-sm mt-2">Editar Comentário</a>
+                                        <a href="delete.php?comentario_id=<?= $comentario['id'] ?>&tipo=publicacao_comentario" class="btn btn-danger btn-sm mt-2" onclick="return confirm('Tem certeza que deseja excluir este comentário?')">Excluir Comentário</a>
+                                    <?php endif; ?>
                                 </div>
                             <?php endwhile;
                         else: ?>
                             <div class="alert alert-secondary">Nenhum comentário ainda.</div>
                         <?php endif; ?>
                     </div>
+
+                    <?php if ($pode_comentar): ?>
+                        <div class="comentario-form">
+                            <h6>Adicionar Comentário</h6>
+                            <form method="POST" action="">
+                                <input type="hidden" name="acao" value="adicionar_comentario">
+                                <input type="hidden" name="publicacao_id" value="<?= $pub['id'] ?>">
+                                <textarea name="comentario" rows="3" class="form-control" required></textarea>
+                                <button type="submit" class="btn btn-primary">Comentar</button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endwhile; ?>
