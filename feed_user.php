@@ -77,6 +77,7 @@ if (isset($_SESSION['cargo'])) {
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
 $pode_comentar = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin');
+$pode_comentar = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin');
 
 $ordem = $_GET['ordem'] ?? 'DESC';
 $ordem_sql = ($ordem === 'ASC') ? 'ASC' : 'DESC';
@@ -186,6 +187,13 @@ $resultado = $stmt->get_result();
     </nav>
 
     <div class="feed-container">
+        <?php if (isset($_SESSION['mensagem'])): ?>
+            <div class="alert alert-<?= $_SESSION['tipo_mensagem'] ?>">
+                <?= $_SESSION['mensagem'] ?>
+            </div>
+            <?php unset($_SESSION['mensagem']); unset($_SESSION['tipo_mensagem']); ?>
+        <?php endif; ?>
+
         <?php if (isset($_SESSION['mensagem'])): ?>
             <div class="alert alert-<?= $_SESSION['tipo_mensagem'] ?>">
                 <?= $_SESSION['mensagem'] ?>
