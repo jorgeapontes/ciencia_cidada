@@ -359,3 +359,113 @@ body {
         max-height: 120px;
     }
 }
+
+
+.comentario-form {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+    display: grid; 
+    gap: 0.5rem; }
+
+.comentario-form h6 {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+    color: #555;
+    grid-column: 1 / -1; 
+}
+
+.comentario-form textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.2rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    box-sizing: border-box; /* Para que padding e border não aumentem a largura */
+}
+
+.comentario-form button {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 0.2rem;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    width: auto; /* Largura automática para se ajustar ao conteúdo */
+}
+
+.comentario-form button:hover {
+    background-color: #0056b3;
+}
+
+.order-filter-container {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.5rem; /* Adicionado padding nas laterais do container */
+}
+
+.order-select-container {
+    text-align: left;
+}
+
+.filter-buttons-container {
+    text-align: right;
+    z-index: 10;
+}
+
+.order-select {
+    padding: 0.6rem 1rem; /* Aumentando o padding */
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da; /* Mantendo a borda sutil */
+    font-size: 0.8rem;
+    appearance: none; /* Remove a aparência padrão do select nos navegadores */
+    background-color: #fff; /* Fundo branco */
+    cursor: pointer;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    /* Adicionando um ícone para a seta do select (opcional) */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 0.8rem 0.8rem;
+}
+
+.order-select:focus {
+    border-color: #007bff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.filter-button {
+    padding: 0.6rem 1rem; /* Aumentando o padding */
+    border-radius: 0.25rem;
+    border: 1px solid #6c757d;
+    background-color: #6c757d;
+    color: white;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.filter-button:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.filter-button.active {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* Adicionando um estilo de hover mais sutil para o botão ativo (opcional) */
+.filter-button.active:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}

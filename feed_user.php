@@ -46,6 +46,7 @@ if (isset($_SESSION['cargo'])) {
 // Verificar o cargo do usuário atual
 $cargo_usuario = $_SESSION['cargo'] ?? 'user';
 $pode_interagir = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin' || $cargo_usuario === 'user');
+$pode_comentar = ($cargo_usuario === 'especialista' || $cargo_usuario === 'admin');
 
 $ordem = $_GET['ordem'] ?? 'DESC';
 $ordem_sql = ($ordem === 'ASC') ? 'ASC' : 'DESC';
@@ -81,55 +82,7 @@ $resultado = $stmt->get_result();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/feed.css">
-    <style>
-        .like-active {
-            color: blue !important;
-        }
-        .dislike-active {
-            color: red !important;
-        }
-        .like-button:hover, .dislike-button:hover {
-            cursor: pointer;
-        }
 
-        .order-filter-container {
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .order-select-container {
-            text-align: left;
-        }
-
-        .filter-buttons-container {
-            text-align: right;
-        }
-
-        .order-select {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.25rem;
-            border: 1px solid #ced4da;
-            font-size: 0.8rem;
-        }
-
-        .filter-button {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.25rem;
-            border: 1px solid #6c757d;
-            background-color: #6c757d;
-            color: white;
-            font-size: 0.8rem;
-            cursor: pointer;
-            margin-left: 0.5rem;
-        }
-
-        .filter-button.active {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
@@ -202,25 +155,18 @@ $resultado = $stmt->get_result();
                                 <i class="bi bi-hand-thumbs-down"></i> <span class="badge bg-light text-dark dislike-count-<?= $pub['id'] ?>"><?= $pub['dislikes'] ?></span>
                             </button>
                         </div>
-
-                        <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $pub['usuario_id']): ?>
-                            <a href="delete.php?id=<?= $pub['id'] ?>&tipo=publicacao" class="btn btn-danger btn-sm ms-auto"
-                               onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">
-                                Excluir
-                            </a>
-                        <?php endif; ?>
                     </div>
 
                     <div class="comentarios-container">
                         <h6>Comentários</h6>
                         <?php
                         $stmt_comentarios = $conn->prepare("
-                                            SELECT c.*, u.nome, u.cargo
-                                            FROM comentarios c
-                                            JOIN usuarios u ON c.usuario_id = u.id
-                                            WHERE c.publicacao_id = ?
-                                            ORDER BY c.data_comentario ASC
-                                        ");
+                                                        SELECT c.*, u.nome, u.cargo
+                                                        FROM comentarios c
+                                                        JOIN usuarios u ON c.usuario_id = u.id
+                                                        WHERE c.publicacao_id = ?
+                                                        ORDER BY c.data_comentario ASC
+                                                     ");
                         $stmt_comentarios->bind_param("i", $pub['id']);
                         $stmt_comentarios->execute();
                         $comentarios = $stmt_comentarios->get_result();
@@ -242,12 +188,33 @@ $resultado = $stmt->get_result();
                                     <p class="comentario-text">
                                         <?= nl2br(htmlspecialchars($comentario['comentario'])) ?>
                                     </p>
+                                    <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $comentario['usuario_id']): ?>
+                                        <a href="delete.php?comentario_id=<?= $comentario['id'] ?>" class="btn btn-danger btn-sm mt-2" onclick="return confirm('Tem certeza que deseja excluir este comentário?')">Excluir Comentário</a>
+                                    <?php endif; ?>
                                 </div>
                             <?php endwhile;
                         else: ?>
                             <div class="alert alert-secondary">Nenhum comentário ainda.</div>
                         <?php endif; ?>
                     </div>
+
+                    <?php if ($pode_comentar): ?>
+                        <div class="comentario-form">
+                            <h6>Adicionar Comentário</h6>
+                            <form method="POST" action="comentar.php">
+                                <input type="hidden" name="publicacao_id" value="<?= $pub['id'] ?>">
+                                <textarea name="comentario" rows="3" class="form-control" required></textarea>
+                                <button type="submit" class="btn btn-primary">Comentar</button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $pub['usuario_id']): ?>
+                        <a href="delete.php?id=<?= $pub['id'] ?>&tipo=publicacao" class="btn btn-danger btn-sm ms-auto"
+                           onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">
+                            Excluir
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endwhile; ?>
