@@ -110,12 +110,12 @@ $resultado = $stmt->get_result();
     <link rel="stylesheet" href="css/feed.css">
     <style>
         .btn-edit {
-            background-color: #ffc107; 
+            background-color:rgb(7, 102, 255); 
             color: white;
             border: none;
         }
         .btn-edit:hover {
-            background-color: #e0a800;
+            background-color:rgb(0, 97, 224);
         }
 
         
