@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 20/05/2025 às 01:23
+-- Tempo de geração: 20/05/2025 às 22:00
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -55,11 +55,21 @@ INSERT INTO `atropelamentos` (`id`, `usuario_id`, `data_ocorrencia`, `localizaca
 CREATE TABLE `comentarios` (
   `id` int(11) NOT NULL,
   `publicacao_id` int(11) NOT NULL,
+  `tipo_publicacao` varchar(50) DEFAULT 'publicacao',
   `usuario_id` int(11) NOT NULL,
   `comentario` text NOT NULL,
   `texto` text NOT NULL,
   `data_comentario` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `comentarios`
+--
+
+INSERT INTO `comentarios` (`id`, `publicacao_id`, `tipo_publicacao`, `usuario_id`, `comentario`, `texto`, `data_comentario`) VALUES
+(10, 8, 'atropelamento', 12, 'testando', '', '2025-05-20 16:14:35'),
+(12, 28, 'publicacao', 12, 'testando', '', '2025-05-20 16:18:58'),
+(13, 29, 'publicacao', 12, 'testando', '', '2025-05-20 16:49:48');
 
 -- --------------------------------------------------------
 
@@ -140,8 +150,8 @@ CREATE TABLE `publicacoes` (
 
 INSERT INTO `publicacoes` (`id`, `especie`, `foto`, `usuario_id`, `data_publicacao`, `titulo`, `descricao`, `caminho_foto`, `atropelamento`, `categoria`) VALUES
 (26, '', '', 16, '2025-05-19 16:21:58', 'Tucano', 'Pássaro com um bico longo', 'fotos/682b84d68a9e1_tucano.jpg', 0, 'animal'),
-(27, '', '', 16, '2025-05-19 16:25:10', 'Ipê Amarelo', 'Arvore bonita', 'fotos/682b8596844bc_ipe amarelo.jpg', 0, 'planta'),
-(28, '', '', 12, '2025-05-19 20:18:17', 'Bem-Te-Vi', 'Testando post como especialista', 'fotos/682bbc3980fb0_download.jpeg', 0, 'animal');
+(28, '', '', 12, '2025-05-19 20:18:17', 'Bem-Te-Vi', 'Testando post como especialista', 'fotos/682bbc3980fb0_download.jpeg', 0, 'animal'),
+(29, '', '', 16, '2025-05-20 16:49:20', 'Ipê amarelo', 'árvore amarela', 'fotos/682cdcc075331_ipe amarelo.jpg', 0, 'planta');
 
 -- --------------------------------------------------------
 
@@ -187,7 +197,6 @@ ALTER TABLE `atropelamentos`
 --
 ALTER TABLE `comentarios`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `publicacao_id` (`publicacao_id`),
   ADD KEY `usuario_id` (`usuario_id`);
 
 --
@@ -250,7 +259,7 @@ ALTER TABLE `atropelamentos`
 -- AUTO_INCREMENT de tabela `comentarios`
 --
 ALTER TABLE `comentarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de tabela `comentarios_atropelamentos`
@@ -280,7 +289,7 @@ ALTER TABLE `interacoes_atropelamentos`
 -- AUTO_INCREMENT de tabela `publicacoes`
 --
 ALTER TABLE `publicacoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
@@ -302,7 +311,6 @@ ALTER TABLE `atropelamentos`
 -- Restrições para tabelas `comentarios`
 --
 ALTER TABLE `comentarios`
-  ADD CONSTRAINT `comentarios_ibfk_1` FOREIGN KEY (`publicacao_id`) REFERENCES `publicacoes` (`id`),
   ADD CONSTRAINT `comentarios_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 
 --
