@@ -146,6 +146,13 @@ $resultado = $stmt->get_result();
     </nav>
 
     <div class="feed-container">
+        <?php if (isset($_SESSION['mensagem'])): ?>
+            <div class="alert alert-<?= $_SESSION['tipo_mensagem'] ?>">
+                <?= $_SESSION['mensagem'] ?>
+            </div>
+            <?php unset($_SESSION['mensagem']); unset($_SESSION['tipo_mensagem']); ?>
+        <?php endif; ?>
+
         <div class="order-filter-container">
             <div class="order-select-container">
                 <select class="order-select" onchange="window.location.href='feed_user.php?ordem=' + this.value + '&filtro=<?= $filtro ?>'">
@@ -197,7 +204,7 @@ $resultado = $stmt->get_result();
                         </div>
 
                         <?php if ($_SESSION['cargo'] === 'admin' || $_SESSION['usuario_id'] === $pub['usuario_id']): ?>
-                            <a href="delete.php?id=<?= $pub['id'] ?>" class="btn btn-danger btn-sm ms-auto"
+                            <a href="delete.php?id=<?= $pub['id'] ?>&tipo=publicacao" class="btn btn-danger btn-sm ms-auto"
                                onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">
                                 Excluir
                             </a>
@@ -208,12 +215,12 @@ $resultado = $stmt->get_result();
                         <h6>Comentários</h6>
                         <?php
                         $stmt_comentarios = $conn->prepare("
-                                    SELECT c.*, u.nome, u.cargo
-                                    FROM comentarios c
-                                    JOIN usuarios u ON c.usuario_id = u.id
-                                    WHERE c.publicacao_id = ?
-                                    ORDER BY c.data_comentario ASC
-                                ");
+                                            SELECT c.*, u.nome, u.cargo
+                                            FROM comentarios c
+                                            JOIN usuarios u ON c.usuario_id = u.id
+                                            WHERE c.publicacao_id = ?
+                                            ORDER BY c.data_comentario ASC
+                                        ");
                         $stmt_comentarios->bind_param("i", $pub['id']);
                         $stmt_comentarios->execute();
                         $comentarios = $stmt_comentarios->get_result();
