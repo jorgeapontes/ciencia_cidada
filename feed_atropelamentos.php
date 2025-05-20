@@ -86,15 +86,13 @@ $filtro = $_GET['filtro'] ?? 'tudo';
 $where_filtro = '';
 
 $stmt = $conn->prepare("
-            SELECT a.*, u.nome, u.id as usuario_id,
-            (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = a.id AND tipo = 'like') AS likes,
-            (SELECT COUNT(*) FROM interacoes WHERE publicacao_id = a.id AND tipo = 'dislike') AS dislikes,
-            (SELECT tipo FROM interacoes WHERE publicacao_id = a.id AND usuario_id = ?) AS minha_interacao
+            SELECT a.*, u.nome, u.id as usuario_id
+            
             FROM atropelamentos a
             JOIN usuarios u ON a.usuario_id = u.id
             WHERE 1 $where_filtro
             ORDER BY a.data_postagem $ordem_sql");
-$stmt->bind_param("i", $_SESSION['usuario_id']);
+
 $stmt->execute();
 $resultado = $stmt->get_result();
 ?>
@@ -119,16 +117,7 @@ $resultado = $stmt->get_result();
         }
 
         
-        .like-active {
-            color: blue !important;
-        }
-        .dislike-active {
-            color: red !important;
-        }
-        .like-button:hover, .dislike-button:hover {
-            cursor: pointer;
-        }
-
+    
         .order-filter-container {
             margin-bottom: 1rem;
             display: flex;
@@ -234,18 +223,7 @@ $resultado = $stmt->get_result();
                     </div>
                     <p class="card-text"><?= nl2br(htmlspecialchars($atropelamento['descricao'] ?? '')) ?></p>
 
-                    <div class="card-actions">
-                        <div class="btn-group" role="group">
-                            <button class="like-button <?= ($pode_interagir ? '' : 'disabled-interact') ?> <?= ($atropelamento['minha_interacao'] === 'like' ? 'like-active' : '') ?>"
-                                    data-publicacao-id="<?= $atropelamento['id'] ?>" data-tipo="like" <?= ($pode_interagir ? '' : 'disabled') ?>>
-                                <i class="bi bi-hand-thumbs-up"></i> <span class="badge bg-light text-dark like-count-<?= $atropelamento['id'] ?>"><?= $atropelamento['likes'] ?></span>
-                            </button>
-                            <button class="dislike-button <?= ($pode_interagir ? '' : 'disabled-interact') ?> <?= ($atropelamento['minha_interacao'] === 'dislike' ? 'dislike-active' : '') ?>"
-                                    data-publicacao-id="<?= $atropelamento['id'] ?>" data-tipo="dislike" <?= ($pode_interagir ? '' : 'disabled') ?>>
-                                <i class="bi bi-hand-thumbs-down"></i> <span class="badge bg-light text-dark dislike-count-<?= $atropelamento['id'] ?>"><?= $atropelamento['dislikes'] ?></span>
-                            </button>
-                        </div>
-                    </div>
+                   
 
                     <div class="comentarios-container">
                         <h6>Comentários</h6>
@@ -316,55 +294,6 @@ $resultado = $stmt->get_result();
         <?php endif; ?>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const botoesInteracao = document.querySelectorAll('.like-button, .dislike-button');
-
-            botoesInteracao.forEach(botao => {
-                botao.addEventListener('click', function(event) {
-                    event.preventDefault();
-
-                    const publicacaoId = this.dataset.publicacaoId;
-                    const tipo = this.dataset.tipo;
-                    const likeCountSpan = document.querySelector('.like-count-' + publicacaoId);
-                    const dislikeCountSpan = document.querySelector('.dislike-count-' + publicacaoId);
-                    const icone = this.querySelector('i');
-
-                    fetch('interacao.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `publicacao_id=${encodeURIComponent(publicacaoId)}&tipo=${encodeURIComponent(tipo)}`
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            if (likeCountSpan) likeCountSpan.textContent = data.likes;
-                            if (dislikeCountSpan) dislikeCountSpan.textContent = data.dislikes;
-
-                            const likeButton = this.parentNode.querySelector('.like-button[data-publicacao-id="' + publicacaoId + '"]');
-                            const dislikeButton = this.parentNode.querySelector('.dislike-button[data-publicacao-id="' + publicacaoId + '"]');
-
-                            if (tipo === 'like') {
-                                likeButton.classList.add('like-active');
-                                dislikeButton.classList.remove('dislike-active');
-                            } else if (tipo === 'dislike') {
-                                dislikeButton.classList.add('dislike-active');
-                                likeButton.classList.remove('like-active');
-                            }
-                        } else {
-                            alert('Erro ao processar interação.');
-                            console.error(data.erro);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro na requisição:', error);
-                        alert('Ocorreu um erro ao interagir.');
-                    });
-                });
-            });
-        });
-    </script>
+   
 </body>
 </html>
