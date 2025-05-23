@@ -39,6 +39,7 @@ body {
 #japi-navbar .navbar-brand {
     font-weight: bold !important;
     font-size: 1.2rem !important;
+    color: white!important;
 }
 
 /* Feed Container */

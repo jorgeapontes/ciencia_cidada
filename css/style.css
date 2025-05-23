@@ -14,7 +14,7 @@ body {
 }
 
 .navbar {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: black;
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
