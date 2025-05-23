@@ -143,15 +143,16 @@
         </style>
     </head>
     <body>
-        <nav id="japi-navbar" class="navbar navbar-expand-lg bg-black">
+        <nav id="japi-navbar" class="navbar navbar-expand-lg">
             <div class="container-fluid">
-                <a class="navbar-brand text-white" href="#">JapiWiki</a>
+                <a class="navbar-brand" href="#">JapiWiki</a>
                 <div class="navbar-nav">
-                    <a class="nav-link text-white" href="home.html">Home</a>
-                    <a class="nav-link text-white" href="<?= $painel_voltar ?>">Painel</a>
-                    <a class="nav-link active fw-bold px-3" href="feed_user.php">Seu Feed</a>
-                    <a class="nav-link text-white" href="feed_atropelamentos.php">Atropelamentos</a>
-                    <a class="nav-link text-white" href="logout.php">Sair</a>
+                    <a class="nav-link" href="home.html">Home</a>
+                    <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>
+                    <a class="nav-link active" href="feed_user.php">Feed</a>
+                    <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                    <a class="nav-link" href="publicar.php">Publicar</a>
+                    <a class="nav-link" href="logout.php">Sair</a>
                 </div>
             </div>
         </nav>

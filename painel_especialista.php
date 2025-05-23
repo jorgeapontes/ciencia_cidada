@@ -175,18 +175,19 @@ usort($posts, function ($a, $b) {
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">JapiWiki</a>
-            <div class="navbar-nav">
-                <a class="nav-link active" href="painel_usuario.php">Painel</a>
-                <a class="nav-link" href="feed_user.php">Ver Feed</a>
-                <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
-                <a class="nav-link" href="publicar.php">Nova Publicação</a>
-                <a class="nav-link" href="logout.php">Sair</a>
+    <nav id="japi-navbar" class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#" style="color: white !important">JapiWiki</a>
+                <div class="navbar-nav">
+                    <a class="nav-link" href="home.html">Home</a>
+                    <a class="nav-link active" href="<?= $painel_voltar ?>">Painel</a>
+                    <a class="nav-link" href="feed_user.php">Feed</a>
+                    <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                    <a class="nav-link" href="publicar.php">Publicar</a>
+                    <a class="nav-link" href="logout.php">Sair</a>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
     <div class="container mt-5">
         <h1>Painel do usuário</h1>

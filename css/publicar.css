@@ -96,7 +96,6 @@ input[type="submit"]:hover {
     background-color: #1e7e34;
 }
 
-/* Estilos para mensagens de erro */
 .error-message {
     color: #dc3545;
     font-weight: bold;
@@ -104,7 +103,6 @@ input[type="submit"]:hover {
     margin-top: 10px;
 }
 
-/* Responsividade */
 @media (max-width: 600px) {
     form {
         padding: 20px;
