@@ -216,11 +216,9 @@ $resultado = $stmt->get_result();
                     <h5 class="card-title"><?= htmlspecialchars($atropelamento['titulo'] ?? '') ?></h5>
                     <div class="post-info">
                         <strong>Por:</strong> <?= htmlspecialchars($atropelamento['nome'] ?? 'Desconhecido') ?>
-                        |
-                        <strong>Data:</strong> <?= date('d/m/Y H:i', strtotime($atropelamento['data_postagem'] ?? '')) ?>
-                        |
-                        <strong>Ocorrência:</strong> <?= htmlspecialchars($atropelamento['data_ocorencia'] ?? '') ?>
-                        |
+                        <br>
+                        <strong>Data:</strong> <?= date('d/m/Y H:i', strtotime($atropelamento['data_postagem'] ?? '')) ?>                       
+                        <br>
                         <strong>Localização:</strong> <?= htmlspecialchars($atropelamento['local_ocorencia'] ?? '') ?>
                     </div>
                     <p class="card-text"><?= nl2br(htmlspecialchars($atropelamento['descricao'] ?? '')) ?></p>
