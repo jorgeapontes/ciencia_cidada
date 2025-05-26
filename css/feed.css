@@ -65,29 +65,24 @@ body {
 
 /* Container da imagem - solução definitiva */
 .card-img-container {
-    height: 250px;
+    height: 400px;
     display: flex;
     justify-content: center;
-    align-items: center;
     background-color: #f8f9fa;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
-    overflow: hidden;
-    position: relative;
-}
-
+    }
 
 .card-img-top {
     max-height: 100%;
-    max-width: 90%;
-    width: auto;
-    height: auto;
+    max-width: 100%;
+
     object-fit: cover;
     object-position: center;
 }
 
 
-/* .card-img-container.landscape .card-img-top {
+.card-img-container.landscape .card-img-top {
     width: 100%;
     height: auto;
 }
@@ -95,7 +90,7 @@ body {
 .card-img-container.portrait .card-img-top {
     width: auto;
     height: 100%;
-} */
+}
 
 .card-body {
     display: flex;
@@ -121,7 +116,7 @@ body {
     margin-top: 5px;
     max-height: 150px;
     overflow-y: auto;
-    background-color: #f8f9fa;
+    background-color: #E2E3E5 !important;
     border-radius: 0.5rem;
     padding: 0.5rem;
 }
@@ -153,7 +148,7 @@ body {
 }
 
 .comment {
-    background-color: #f8f9fa;
+    background-color: #E2E3E5 !important;
     border-radius: 0.5rem;
     padding: 0.5rem;
 }
@@ -188,7 +183,7 @@ body {
     font-style: italic;
     color: #6c757d;
     text-align: center;
-    background-color: #F8F9FA;
+    background-color: #E2E3E5;
     border-radius: 0.5rem;
     padding: 1rem;
 }

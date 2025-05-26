@@ -41,7 +41,6 @@ body {
     font-size: 1.2rem !important;
 }
 
-/* Feed Container */
 .feed-container {
     max-width: 1200px;
     margin: 1rem auto;
@@ -66,29 +65,24 @@ body {
 
 /* Container da imagem - solução definitiva */
 .card-img-container {
-    height: 250px;
+    height: 400px;
     display: flex;
     justify-content: center;
-    align-items: center;
     background-color: #f8f9fa;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
-    overflow: hidden;
-    position: relative;
-}
-
+    }
 
 .card-img-top {
     max-height: 100%;
-    max-width: 90%;
-    width: auto;
-    height: auto;
+    max-width: 100%;
+        
     object-fit: cover;
     object-position: center;
 }
 
 
-/* .card-img-container.landscape .card-img-top {
+.card-img-container.landscape .card-img-top {
     width: 100%;
     height: auto;
 }
@@ -96,7 +90,7 @@ body {
 .card-img-container.portrait .card-img-top {
     width: auto;
     height: 100%;
-} */
+}
 
 .card-body {
     display: flex;
