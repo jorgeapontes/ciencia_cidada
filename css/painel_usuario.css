@@ -7,13 +7,13 @@ body {
     color: #333;
 }
 .navbar {
-    background-color: black;
+    background-color: black; 
 }
 .nav-link {
     margin-left: 2px;
 }
 .brand {
-    color: white;
+    color: white; 
     font-weight: bold !important;
     font-size: 1.2rem !important;
     text-decoration: none;
@@ -28,7 +28,7 @@ body {
     align-items: center !important;
 }
 .navbar-nav .nav-link {
-    color: white;
+    color: white; 
     margin: 0 0.25rem !important;
     padding: 0.5rem 0.75rem !important;
 
@@ -39,7 +39,7 @@ body {
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3e%3c/svg%3e");
 }
 
 .navbar-expand-lg {
@@ -104,12 +104,12 @@ p {
     background-color: #e74c3c;
 }
 
-/* Grid de botões */
+
 .d-grid {
     margin-top: 2rem;
 }
 
-/* Efeitos de hover nos botões */
+
 .btn-success:hover {
     background-color: #2ecc71;
 }
@@ -164,7 +164,8 @@ p {
     }
 }
 
-/* Animação de entrada */
+
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -174,7 +175,7 @@ p {
     animation: fadeIn 0.6s ease-out forwards;
 }
 
-/* Efeito de destaque no nome do usuário */
+
 p strong {
     color: #e74c3c;
     font-weight: 600;

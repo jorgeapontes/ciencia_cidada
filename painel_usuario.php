@@ -61,7 +61,7 @@ $resultado_especies = $stmt_especies->get_result();
 $total_especies = $resultado_especies->fetch_assoc()['total_especies'];
 $stmt_especies->close();
 
-// Contagem de posts de animais (assumindo que há uma coluna 'categoria' ou similar na tabela 'publicacoes')
+// Contagem de posts de animais 
 $stmt_animais = $conn->prepare("
     SELECT COUNT(*) AS total_animais
     FROM publicacoes
@@ -73,7 +73,7 @@ $resultado_animais = $stmt_animais->get_result();
 $total_animais = $resultado_animais->fetch_assoc()['total_animais'];
 $stmt_animais->close();
 
-// Contagem de posts de plantas (assumindo que há uma coluna 'categoria' ou similar na tabela 'publicacoes')
+// Contagem de posts de plantas 
 $stmt_plantas = $conn->prepare("
     SELECT COUNT(*) AS total_plantas
     FROM publicacoes
@@ -97,7 +97,7 @@ $resultado_atropelamentos_count = $stmt_atropelamentos_count->get_result();
 $total_atropelamentos = $resultado_atropelamentos_count->fetch_assoc()['total_atropelamentos'];
 $stmt_atropelamentos_count->close();
 
-// Buscar as publicações normais do usuário
+// Buscar as publicações normais 
 $stmt_publicacoes = $conn->prepare("
     SELECT p.*
     FROM publicacoes p
@@ -109,7 +109,7 @@ $stmt_publicacoes->execute();
 $resultado_publicacoes = $stmt_publicacoes->get_result();
 $publicacoes = $resultado_publicacoes->fetch_all(MYSQLI_ASSOC);
 
-// Buscar os casos de atropelamento do usuário
+// Buscar os casos de atropelamento 
 $stmt_atropelamentos = $conn->prepare("
     SELECT a.*
     FROM atropelamentos a
@@ -183,10 +183,8 @@ usort($posts, function ($a, $b) {
 <body>
     <nav id="navbar" class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="brand" href="#">JapiWiki</a>
-            <div id="japi-navbar"class="navbar-nav">
-                <a class="nav-link" href="home.html">Home</a>
-                <a class="nav-link active" href="painel_usuario.php">Painel</a>
+            <a class="brand" href="home.php">JapiWiki</a> <div id="japi-navbar"class="navbar-nav">
+                <a class="nav-link" href="home.php">Home</a> <a class="nav-link active" href="painel_usuario.php">Painel</a>
                 <a class="nav-link" href="feed_user.php">Feed</a>
                 <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
                 <a class="nav-link" href="publicar.php">Publicar</a>

@@ -167,7 +167,7 @@ $resultado = $stmt->get_result();
         <div class="container-fluid">
             <a class="navbar-brand" href="#">JapiWiki</a>
             <div class="navbar-nav">
-                <a class="nav-link" href="home.html">Home</a>
+                <a class="nav-link" href="home.php">Home</a>
                 <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>
                 <a class="nav-link" href="feed_user.php">Feed</a>
                 <a class="nav-link active" href="feed_atropelamentos.php">Atropelamentos</a>
