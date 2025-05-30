@@ -34,6 +34,18 @@ if (!isset($_SESSION['usuario_id'])) {
 include 'conexao.php';
 
 $usuario_id = $_SESSION['usuario_id'];
+$area_especialidade = ''; // Inicializa a variável
+
+// Obter a área de especialidade do usuário
+$stmt_area = $conn->prepare("SELECT area_especialidade FROM usuarios WHERE id = ?");
+$stmt_area->bind_param("i", $usuario_id);
+$stmt_area->execute();
+$resultado_area = $stmt_area->get_result();
+if ($resultado_area->num_rows > 0) {
+    $dados_usuario = $resultado_area->fetch_assoc();
+    $area_especialidade = $dados_usuario['area_especialidade'];
+}
+$stmt_area->close();
 
 $stmt_total_posts = $conn->prepare("
     SELECT COUNT(*) AS total FROM (
@@ -176,23 +188,26 @@ usort($posts, function ($a, $b) {
 </head>
 <body>
     <nav id="japi-navbar" class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#" style="color: white !important">JapiWiki</a>
-                <div class="navbar-nav">
-                    <a class="nav-link" href="home.php">Home</a>
-                    <a class="nav-link active" href="<?= $painel_voltar ?>">Painel</a>
-                    <a class="nav-link" href="feed_user.php">Feed</a>
-                    <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
-                    <a class="nav-link" href="publicar.php">Publicar</a>
-                    <a class="nav-link" href="logout.php">Sair</a>
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#" style="color: white !important">JapiWiki</a>
+                    <div class="navbar-nav">
+                        <a class="nav-link" href="home.php">Home</a>
+                        <a class="nav-link active" href="<?= $painel_voltar ?>">Painel</a>
+                        <a class="nav-link" href="feed_user.php">Feed</a>
+                        <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                        <a class="nav-link" href="publicar.php">Publicar</a>
+                        <a class="nav-link" href="logout.php">Sair</a>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
 
     <div class="container mt-5">
-        <h1>Painel do usuário</h1>
+        <h1>Painel do Especialista</h1>
         <?php if (isset($_SESSION['nome'])): ?>
             <p>Bem-vindo(a), <?= htmlspecialchars($_SESSION['nome']) ?>!</p>
+            <?php if (!empty($area_especialidade)): ?>
+                <p>Área de Atuação: <strong><?= htmlspecialchars(ucwords(str_replace('_', ' ', $area_especialidade))) ?></strong></p>
+            <?php endif; ?>
         <?php endif; ?>
 
         <div class="user-stats">

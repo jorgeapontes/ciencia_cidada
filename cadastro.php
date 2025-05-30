@@ -7,8 +7,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = $_POST["nome"];
     $email = $_POST["email"];
     $senha = password_hash($_POST["senha"], PASSWORD_DEFAULT);
+    $cargo = $_POST["cargo"]; 
+    
+    $area_especialidade = null;
 
-    $cargo = ($_POST["cargo"] == 'especialista') ? 'especialista' : 'user';
+    if ($cargo == 'especialista') {
+        $area_especialidade = $_POST["area_especialidade"] ?? null;
+    }
 
     // Verifica se o email é duplicado
     $stmt_check = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
@@ -19,19 +24,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt_check->num_rows > 0) {
         $erro = "Este email já está cadastrado.";
     } else {
-        $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, senha, cargo) VALUES (?, ?, ?, ?)");
+        
+        $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, senha, cargo, area_especialidade) VALUES (?, ?, ?, ?, ?)");
         if ($stmt) {
-            $stmt->bind_param("ssss", $nome, $email, $senha, $cargo);
+            $stmt->bind_param("sssss", $nome, $email, $senha, $cargo, $area_especialidade);
             if ($stmt->execute()) {
                 $sucesso = "Cadastro realizado com sucesso! <a href='login.php'>Faça login</a>";
             } else {
                 $erro = "Erro: " . $stmt->error;
             }
+            $stmt->close(); 
         } else {
             $erro = "Erro na preparação da query.";
         }
     }
+    $stmt_check->close(); 
 }
+$conn->close(); 
 ?>
 
 <!DOCTYPE html>
@@ -39,10 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Aves</title>
+    <title>Cadastro - JapiWiki</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/cadastro.css">
-    
 </head>
 <body class="bg-light">
     <div class="container mt-5">
@@ -72,8 +80,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <option value="">Selecione...</option>
                                     <option value="user">Usuário Comum</option>
                                     <option value="especialista">Especialista</option>
-                                    </select>
+                                </select>
                             </div>
+
+                            <div id="camposEspecialista" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="area_especialidade" class="form-label">Área de Especialidade:</label>
+                                    <select class="form-control" id="area_especialidade" name="area_especialidade">
+                                        <option value="">Selecione uma área</option>
+                                        <option value="botanica">Botânica</option>
+                                        <option value="zoologia">Zoologia</option>
+                                        <option value="ecologia">Ecologia</option>
+                                        <option value="biologia_marinha">Biologia Marinha</option>
+                                        <option value="ornitologia">Ornitologia</option>
+                                        <option value="entomologia">Entomologia</option>
+                                        <option value="herpetologia">Herpetologia</option>
+                                        <option value="micologia">Micologia</option>
+                                        </select>
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn btn-success w-100">Cadastrar</button>
                         </form>
 
@@ -93,5 +119,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cargoSelect = document.getElementById('cargo');
+            const camposEspecialista = document.getElementById('camposEspecialista');
+            const areaEspecialidadeSelect = document.getElementById('area_especialidade');
+
+            function toggleCamposEspecialista() {
+                if (cargoSelect.value === 'especialista') {
+                    camposEspecialista.style.display = 'block';
+                
+                    areaEspecialidadeSelect.setAttribute('required', 'required');
+                } else {
+                    camposEspecialista.style.display = 'none';
+                   
+                    areaEspecialidadeSelect.removeAttribute('required');
+                    
+                    areaEspecialidadeSelect.value = '';
+                }
+            }
+
+            
+            cargoSelect.addEventListener('change', toggleCamposEspecialista);
+
+           
+            toggleCamposEspecialista();
+        });
+    </script>
 </body>
 </html>
