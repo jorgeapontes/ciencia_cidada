@@ -10,11 +10,26 @@ if (!isset($_SESSION['usuario_id'])) {
         <title>Acesso Negado</title>
         <style>
             body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-            .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: center; }
-            h1 { color: #d9534f; margin-bottom: 20px; }
-            p { margin-bottom: 15px; }
-            .login-link { color: #007bff; text-decoration: none; font-weight: bold; }
-            .login-link:hover { text-decoration: underline; }
+            .container { 
+                background-color: white;
+                padding: 30px; 
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                text-align: center; 
+            }
+            h1 { 
+                color: #d9534f; 
+                margin-bottom: 20px;
+            }
+            p { 
+                margin-bottom: 15px; 
+            }
+            .login-link { 
+                color: #007bff; text-decoration: none; font-weight: bold;
+             }
+            .login-link:hover { 
+                text-decoration: underline;
+             }
         </style>
     </head>
     <body>
@@ -47,10 +62,11 @@ if (isset($_SESSION['cargo'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $titulo = $_POST["titulo"];
     $descricao = $_POST["descricao"];
-    $atropelamento = $_POST["atropelamento"]; // Recebe '1' ou '0'
+    $atropelamento = $_POST["atropelamento"]; 
     
-    $categoria_principal = $_POST["categoria"] ?? null; // "animal" ou "planta"
+    $categoria_principal = $_POST["categoria"] ?? null;
     $sub_categoria_final = null;
+    $nome_cientifico = $_POST['nome_cientifico'] ?? null; // Receber o nome científico
 
     if ($categoria_principal === 'animal') {
         $sub_categoria_final = $_POST['sub_categoria_animal'] ?? null;
@@ -58,11 +74,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sub_categoria_final = $_POST['sub_categoria_planta'] ?? null;
     }
 
-    // Processamento do upload da foto
     $caminho_foto = '';
     if (isset($_FILES["foto"]) && $_FILES["foto"]["error"] == 0) {
         $pasta_destino = "fotos/";
-        // Cria a pasta se não existir
         if (!is_dir($pasta_destino)) {
             mkdir($pasta_destino, 0777, true);
         }
@@ -72,26 +86,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($atropelamento == '1') {
-        // Preparar variáveis para atropelamento
         $localizacao = $_POST['localizacao'] ?? '';
-        $especie = $_POST['especie'] ?? ''; // Este campo 'especie' é o do formulário de atropelamento
+        $especie_atropelamento = $_POST['especie_atropelamento'] ?? ''; // Renomeado para evitar conflito com coluna da tabela
         $data_ocorrencia = $_POST['data_ocorrencia'] ?? null;
 
         // Inserir na tabela de atropelamentos
-        // MODIFICADO: 'categoria' recebe $categoria_principal, e adicionada 'sub_categoria' para $sub_categoria_final
-        $stmt = $conn->prepare("INSERT INTO atropelamentos (usuario_id, data_ocorrencia, localizacao, especie, descricao, caminho_foto, data_postagem, categoria, sub_categoria) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?)");
-        // MODIFICADO: bind_param atualizado para "isssssss" e variáveis correspondentes
-        $stmt->bind_param("isssssss", $_SESSION['usuario_id'], $data_ocorrencia, $localizacao, $especie, $descricao, $caminho_foto, $categoria_principal, $sub_categoria_final);
+        // Adicionada a coluna nome_cientifico
+        $stmt = $conn->prepare("INSERT INTO atropelamentos (usuario_id, data_ocorrencia, localizacao, especie, descricao, caminho_foto, data_postagem, categoria, sub_categoria, nome_cientifico) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)");
+        // Atualizado bind_param para "issssssss"
+        $stmt->bind_param("issssssss", $_SESSION['usuario_id'], $data_ocorrencia, $localizacao, $especie_atropelamento, $descricao, $caminho_foto, $categoria_principal, $sub_categoria_final, $nome_cientifico);
         $tabela_destino = 'feed_atropelamentos.php';
     } else {
-        // Preparar variáveis para publicação normal
         $caminho_foto_value = $caminho_foto ?? '';
 
         // Inserir na tabela de publicações (feed geral)
-        // MODIFICADO: 'categoria' recebe $categoria_principal, e adicionada 'sub_categoria' para $sub_categoria_final
-        $stmt = $conn->prepare("INSERT INTO publicacoes (usuario_id, titulo, descricao, caminho_foto, data_publicacao, atropelamento, categoria, sub_categoria) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?)");
-        // MODIFICADO: bind_param atualizado para "isssiss" e variáveis correspondentes
-        $stmt->bind_param("isssiss", $_SESSION['usuario_id'], $titulo, $descricao, $caminho_foto_value, $atropelamento, $categoria_principal, $sub_categoria_final);
+        // Adicionada a coluna nome_cientifico
+        $stmt = $conn->prepare("INSERT INTO publicacoes (usuario_id, titulo, descricao, caminho_foto, data_publicacao, atropelamento, categoria, sub_categoria, nome_cientifico) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)");
+        // Atualizado bind_param para "isssisss"
+        $stmt->bind_param("isssisss", $_SESSION['usuario_id'], $titulo, $descricao, $caminho_foto_value, $atropelamento, $categoria_principal, $sub_categoria_final, $nome_cientifico);
         $tabela_destino = 'feed_user.php';
     }
 
@@ -99,7 +111,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: " . $tabela_destino);
         exit;
     } else {
-        echo "Erro ao publicar: " . $stmt->error;
+        // Para depuração, exibir mais detalhes do erro:
+        error_log("Erro ao publicar: " . $stmt->error . " SQL: " . $stmt->sqlstate); // Logar o erro
+        echo "Erro ao publicar. Por favor, tente novamente. Detalhes do erro foram registrados."; // Mensagem genérica para o usuário
     }
 
     $stmt->close();
@@ -114,19 +128,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publicar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
-</head>
+    <link rel="stylesheet" href="css/styles.css"> </head>
 <body>
-    <nav id="japi-navbar" class="navbar navbar-expand-lg">
-        <div class="container-fluid">
+    <nav id="japi-navbar" class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid">
             <a class="navbar-brand" href="#">JapiWiki</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="home.php">Home</a>
-                <a class="nav-link" href="<?= htmlspecialchars($painel_voltar) ?>">Painel</a>
-                <a class="nav-link" href="feed_user.php">Feed</a>
-                <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
-                <a class="nav-link active" href="publicar.php">Publicar</a>
-                <a class="nav-link" href="logout.php">Sair</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="home.php">Home</a>
+                    <a class="nav-link" href="<?= htmlspecialchars($painel_voltar) ?>">Painel</a>
+                    <a class="nav-link" href="feed_user.php">Feed</a>
+                    <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
+                    <a class="nav-link active" aria-current="page" href="publicar.php">Publicar</a>
+                    <a class="nav-link" href="logout.php">Sair</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -135,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Nova Publicação</h2>
         <form method="POST" enctype="multipart/form-data">
             <div class="mb-3">
-                <label for="titulo" class="form-label">Título</label>
+                <label for="titulo" class="form-label">Título (Nome Popular)</label>
                 <input type="text" class="form-control" id="titulo" name="titulo" required>
             </div>
             <div class="mb-3">
@@ -144,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="mb-3">
                 <label for="foto" class="form-label">Foto</label>
-                <input type="file" class="form-control" id="foto" name="foto">
+                <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
             </div>
             <div class="mb-3">
                 <label class="form-label">Este é um caso de atropelamento?</label><br>
@@ -163,8 +180,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="text" class="form-control" id="localizacao" name="localizacao">
                 </div>
                 <div class="mb-3">
-                    <label for="especie" class="form-label">Espécie (do atropelamento - opcional)</label>
-                    <input type="text" class="form-control" id="especie" name="especie">
+                    <label for="especie_atropelamento" class="form-label">Espécie (do atropelamento - opcional)</label>
+                    <input type="text" class="form-control" id="especie_atropelamento" name="especie_atropelamento">
                 </div>
                 <div class="mb-3">
                     <label for="data_ocorrencia" class="form-label">Data e Hora da Ocorrência</label>
@@ -232,94 +249,87 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
+            <div class="mb-3" id="campo-nome-cientifico" style="display: none;">
+                <label for="nome_cientifico" class="form-label">Nome Científico (opcional)</label>
+                <input type="text" class="form-control" id="nome_cientifico" name="nome_cientifico" placeholder="Ex: Homo sapiens">
+            </div>
+
             <button type="submit" class="btn btn-primary">Publicar</button>
         </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Mostrar/ocultar campos extras quando selecionar atropelamento
-        document.querySelectorAll('input[name="atropelamento"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const camposAtropelamento = document.getElementById('campos-atropelamento');
-                if (this.value === '1') {
-                    camposAtropelamento.style.display = 'block';
-                     // Definir campos de atropelamento como obrigatórios se "Sim"
-                    document.getElementById('data_ocorrencia').required = true;
-                    // localizacao e especie são opcionais, não precisam de 'required' aqui
-                } else {
-                    camposAtropelamento.style.display = 'none';
-                    // Remover obrigatoriedade se "Não"
-                    document.getElementById('data_ocorrencia').required = false;
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar/ocultar campos extras quando selecionar atropelamento
+            const radiosAtropelamento = document.querySelectorAll('input[name="atropelamento"]');
+            const camposAtropelamento = document.getElementById('campos-atropelamento');
+            const dataOcorrenciaInput = document.getElementById('data_ocorrencia');
+
+            radiosAtropelamento.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === '1') {
+                        camposAtropelamento.style.display = 'block';
+                        dataOcorrenciaInput.required = true;
+                    } else {
+                        camposAtropelamento.style.display = 'none';
+                        dataOcorrenciaInput.required = false;
+                    }
+                });
             });
-        });
-
-        // Mostrar/ocultar sub-categorias e definir 'required' dinamicamente
-        const categoriaAnimalRadio = document.getElementById('categoria_animal');
-        const categoriaPlantaRadio = document.getElementById('categoria_planta');
-        const subCategoriaAnimalDiv = document.getElementById('sub-categoria-animal-div');
-        const subCategoriaPlantaDiv = document.getElementById('sub-categoria-planta-div');
-        const subCategoriaAnimalRadios = document.querySelectorAll('input[name="sub_categoria_animal"]');
-        const subCategoriaPlantaRadios = document.querySelectorAll('input[name="sub_categoria_planta"]');
-
-        function updateSubCategoriaVisibility() {
-            if (categoriaAnimalRadio.checked) {
-                subCategoriaAnimalDiv.style.display = 'block';
-                subCategoriaPlantaDiv.style.display = 'none';
-                let isAnimalSubCategoryChecked = false;
-                subCategoriaAnimalRadios.forEach(r => {
-                    r.required = true;
-                    if(r.checked) isAnimalSubCategoryChecked = true;
-                });
-                 // Se nenhuma subcategoria de animal estiver marcada, marque a primeira como default e required
-                if(!isAnimalSubCategoryChecked && subCategoriaAnimalRadios.length > 0){
-                   // subCategoriaAnimalRadios[0].checked = true; // Opcional: marcar uma default
-                }
-
-                subCategoriaPlantaRadios.forEach(r => { 
-                    r.required = false; 
-                    r.checked = false; 
-                });
-            } else if (categoriaPlantaRadio.checked) {
-                subCategoriaAnimalDiv.style.display = 'none';
-                subCategoriaPlantaDiv.style.display = 'block';
-                subCategoriaAnimalRadios.forEach(r => { 
-                    r.required = false; 
-                    r.checked = false; 
-                });
-
-                let isPlantaSubCategoryChecked = false;
-                subCategoriaPlantaRadios.forEach(r => {
-                    r.required = true;
-                    if(r.checked) isPlantaSubCategoryChecked = true;
-                });
-                // Se nenhuma subcategoria de planta estiver marcada, marque a primeira como default e required
-                if(!isPlantaSubCategoryChecked && subCategoriaPlantaRadios.length > 0){
-                   // subCategoriaPlantaRadios[0].checked = true; // Opcional: marcar uma default
-                }
-
-            } else { // Caso nenhuma categoria principal esteja selecionada (inicialmente)
-                subCategoriaAnimalDiv.style.display = 'none';
-                subCategoriaPlantaDiv.style.display = 'none';
-                subCategoriaAnimalRadios.forEach(r => { r.required = false; r.checked = false; });
-                subCategoriaPlantaRadios.forEach(r => { r.required = false; r.checked = false; });
+            // Estado inicial dos campos de atropelamento
+            if (document.getElementById('atropelamento_sim').checked) {
+                camposAtropelamento.style.display = 'block';
+                dataOcorrenciaInput.required = true;
+            } else {
+                camposAtropelamento.style.display = 'none';
+                dataOcorrenciaInput.required = false;
             }
-        }
 
-        categoriaAnimalRadio.addEventListener('change', updateSubCategoriaVisibility);
-        categoriaPlantaRadio.addEventListener('change', updateSubCategoriaVisibility);
 
-        // Chama a função no carregamento da página para garantir o estado correto caso o formulário
-        // seja recarregado com valores (embora neste caso não haja pré-seleção default para categorias)
-        updateSubCategoriaVisibility();
+            // Mostrar/ocultar sub-categorias, nome científico e definir 'required' dinamicamente
+            const categoriaAnimalRadio = document.getElementById('categoria_animal');
+            const categoriaPlantaRadio = document.getElementById('categoria_planta');
+            const subCategoriaAnimalDiv = document.getElementById('sub-categoria-animal-div');
+            const subCategoriaPlantaDiv = document.getElementById('sub-categoria-planta-div');
+            const campoNomeCientificoDiv = document.getElementById('campo-nome-cientifico'); // Adicionado
+            const subCategoriaAnimalRadios = document.querySelectorAll('input[name="sub_categoria_animal"]');
+            const subCategoriaPlantaRadios = document.querySelectorAll('input[name="sub_categoria_planta"]');
 
-        // Ajuste para o campo data_ocorrencia: torná-lo obrigatório apenas se atropelamento for 'Sim'
-        // E garantir que não seja obrigatório se atropelamento for 'Não' no carregamento inicial
-        if (document.getElementById('atropelamento_nao').checked) {
-             document.getElementById('data_ocorrencia').required = false;
-        }
+            function updateSubCategoriaVisibility() {
+                let isAnimalChecked = categoriaAnimalRadio.checked;
+                let isPlantaChecked = categoriaPlantaRadio.checked;
 
+                subCategoriaAnimalDiv.style.display = isAnimalChecked ? 'block' : 'none';
+                subCategoriaPlantaDiv.style.display = isPlantaChecked ? 'block' : 'none';
+                campoNomeCientificoDiv.style.display = (isAnimalChecked || isPlantaChecked) ? 'block' : 'none'; // Mostrar se animal ou planta
+
+                subCategoriaAnimalRadios.forEach(r => { 
+                    r.required = isAnimalChecked; 
+                    if (!isAnimalChecked) r.checked = false;
+                });
+                subCategoriaPlantaRadios.forEach(r => { 
+                    r.required = isPlantaChecked;
+                    if (!isPlantaChecked) r.checked = false;
+                });
+
+                // Lógica para garantir que pelo menos uma subcategoria seja selecionada se a categoria principal estiver
+                // (Opcional, mas recomendado para UX)
+                if (isAnimalChecked && !Array.from(subCategoriaAnimalRadios).some(r => r.checked)) {
+                    // Poderia marcar um default ou apenas confiar na validação HTML5
+                    // subCategoriaAnimalRadios[0].checked = true; // Exemplo: marcar o primeiro como default
+                }
+                if (isPlantaChecked && !Array.from(subCategoriaPlantaRadios).some(r => r.checked)) {
+                    // subCategoriaPlantaRadios[0].checked = true; // Exemplo
+                }
+            }
+
+            categoriaAnimalRadio.addEventListener('change', updateSubCategoriaVisibility);
+            categoriaPlantaRadio.addEventListener('change', updateSubCategoriaVisibility);
+
+            // Chama a função no carregamento da página
+            updateSubCategoriaVisibility();
+        });
     </script>
 </body>
 </html>
