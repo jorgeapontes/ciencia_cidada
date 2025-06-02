@@ -120,7 +120,6 @@ $resultado = $stmt->get_result();
         
     
         .order-filter-container {
-            margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -156,10 +155,7 @@ $resultado = $stmt->get_result();
            
         }
 
-        .filter-button.active {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
+        
     </style>
 </head>
 <body>

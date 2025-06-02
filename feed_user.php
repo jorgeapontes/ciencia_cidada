@@ -72,7 +72,7 @@ if (isset($_SESSION['cargo'])) {
 }
 
 $cargo_usuario_sessao = $_SESSION['cargo'] ?? 'user';
-$pode_interagir = true; 
+$pode_interagir = true;
 $pode_comentar = ($cargo_usuario_sessao === 'especialista' || $cargo_usuario_sessao === 'admin');
 
 $ordem = $_GET['ordem'] ?? 'DESC';
@@ -123,23 +123,23 @@ $resultado = $stmt->get_result();
             cursor: pointer;
             transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out; /* Transição suave */
             display: inline-flex;   /* Para alinhar ícone e texto corretamente */
-            align-items: center;    /* Alinha ícone e texto verticalmente */
+            align-items: center;     /* Alinha ícone e texto verticalmente */
             line-height: 1.5;       /* Altura da linha padrão */
         }
 
         .card-actions .btn-group > .like-button:hover,
         .card-actions .btn-group > .dislike-button:hover {
             background-color: #f8f9fa; /* Cinza muito claro no hover */
-            border-color: #adb5bd;     /* Borda um pouco mais escura no hover */
+            border-color: #adb5bd;      /* Borda um pouco mais escura no hover */
         }
 
         /* Estilo para like ATIVO (cores neutras) */
         .like-button.like-active {
-            background-color: #e9ecef;  /* Fundo cinza claro para ativo */
-            border-color: #adb5bd;      /* Borda cinza para ativo */
+            background-color: #e9ecef;   /* Fundo cinza claro para ativo */
+            border-color: #adb5bd;       /* Borda cinza para ativo */
             color: #28a745;             /* Ícone/texto verde para 'like' ativo (sutil) */
             /* Se preferir totalmente neutro para o ícone/texto: */
-            /* color: #212529; */       /* Preto/cinza escuro */
+            /* color: #212529; */      /* Preto/cinza escuro */
         }
 
         /* Estilo para dislike ATIVO (cores neutras) */
@@ -148,52 +148,47 @@ $resultado = $stmt->get_result();
             border-color: #adb5bd;     /* Borda cinza para ativo */
             color: #dc3545;            /* Ícone/texto vermelho para 'dislike' ativo (sutil) */
             /* Se preferir totalmente neutro para o ícone/texto: */
-            /* color: #212529; */      /* Preto/cinza escuro */
-        }
-        
-        /* Contador dentro dos botões */
-        .card-actions .btn-group > button .badge {
-            background-color: #f8f9fa !important; /* Fundo claro para o contador */
-            color: #212529 !important;          /* Texto escuro para o contador */
-            border: 1px solid #dee2e6;          /* Borda sutil no contador */
-            padding: 0.2em 0.4em;               /* Padding menor para o badge */
-            font-size: 0.75em;                  /* Fonte menor para o badge */
-            margin-left: 5px;                   /* Espaço entre ícone e contador */
+            /* color: #212529; */     /* Preto/cinza escuro */
         }
 
-        /* Outros estilos (mantidos da sua versão anterior) */
-        .order-filter-container { 
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        .card-actions .btn-group > button .badge {
+            background-color: #f8f9fa !important; /* Fundo claro para o contador */
+            color: #212529 !important;           /* Texto escuro para o contador */
+            border: 1px solid #dee2e6;           /* Borda sutil no contador */
+            padding: 0.2em 0.4em;                 /* Padding menor para o badge */
+            font-size: 0.75em;                   /* Fonte menor para o badge */
+            margin-left: 5px;
         }
-        .order-select { 
+
+        .order-filter-container {
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .order-select {
             padding: 0.5rem 0.75rem; border-radius: 0.25rem; border: 1px solid #ced4da; font-size: 0.9rem;
         }
-        .filter-button { 
+        .filter-button {
             padding: 0.5rem 0.75rem; border-radius: 0.25rem; background-color: #6c757d; color: white; font-size: 0.9rem; cursor: pointer; margin-left: 0.5rem; border: none;
         }
-        .filter-button.active { 
-            background-color: #007bff; border-color: #007bff; 
+        .filter-button.active {
+            background-color: #007bff; border-color: #007bff;
         }
-        .btn-edit { 
+        .btn-edit {
             background-color: rgb(7, 143, 255); color: white; border: none !important;
         }
-        .btn-edit:hover { 
-            background-color: rgb(0, 146, 224); 
+        .btn-edit:hover {
+            background-color: rgb(0, 146, 224);
         }
         .disabled-interact, button[disabled] { /* Estilo para botões desabilitados */
-            opacity: 0.65; cursor: not-allowed !important; 
+            opacity: 0.65; cursor: not-allowed !important;
         }
         .post-info {
             font-size: 0.85em; color: #555; margin-bottom: 10px;
         }
         .description-container {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
         .card-actions {
             display: flex; justify-content: space-between; align-items: center;
-        }
-        .comment-section h6 {
-            margin-top: 15px; margin-bottom: 10px;
         }
         .comment {
             background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 10px;
@@ -220,7 +215,7 @@ $resultado = $stmt->get_result();
         .badge.bg-danger { background-color: #dc3545 !important; }
 
         .post-category-info {
-            font-size: 0.9em; color: #333; margin-top: 8px; 
+            font-size: 0.9em; color: #333; margin-top: 8px;
         }
         .post-category-info strong {
             color: #000;
@@ -231,13 +226,13 @@ $resultado = $stmt->get_result();
     </style>
 </head>
 <body>
-    <nav id="japi-navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
+    <nav id="japi-navbar" class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-end">
+        <div class="container-fluid d-flex justify-content-between">
             <a class="navbar-brand" href="#">JapiWiki</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-link" href="home.php">Home</a>
                     <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>
@@ -277,7 +272,7 @@ $resultado = $stmt->get_result();
             <div class="card mb-3">
                 <?php
                 $nome_arquivo = basename($pub['caminho_foto']);
-                $caminho_imagem = "fotos/" . $nome_arquivo; 
+                $caminho_imagem = "fotos/" . $nome_arquivo;
                 ?>
 
                 <div class="card-img-container">
@@ -292,7 +287,7 @@ $resultado = $stmt->get_result();
 
                 <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($pub['titulo'] ?? '') ?></h5>
-                    
+
                     <div class="post-info">
                         <strong>Por:</strong> <?= htmlspecialchars($pub['nome_usuario_post'] ?? 'Desconhecido') ?>
                         <?php if ($pub['cargo_usuario_post'] === 'especialista'): ?>
@@ -303,7 +298,7 @@ $resultado = $stmt->get_result();
                         <br>
                         <strong>Data:</strong> <?= date('d/m/Y H:i', strtotime($pub['data_publicacao'] ?? '')) ?>
                     </div>
-                    
+
                     <div class="description-container">
                         <p class="card-text"><strong>Descrição:</strong><br>
                         <?= nl2br(htmlspecialchars($pub['descricao'] ?? '')) ?></p>
@@ -335,14 +330,14 @@ $resultado = $stmt->get_result();
 
                         <?php if (isset($_SESSION['cargo']) && ($_SESSION['cargo'] === 'admin' || (isset($pub['id_usuario_post']) && $_SESSION['usuario_id'] == $pub['id_usuario_post']))): ?>
                             <a href="delete.php?id=<?= $pub['id'] ?>&tipo=publicacao" class="btn btn-danger btn-sm"
-                            onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">
+                               onclick="return confirm('Tem certeza que deseja excluir esta publicação?')">
                                 Excluir
                             </a>
                         <?php endif; ?>
                     </div>
 
                     <div class="comment-section">
-                        <h6 class="mt-3">Comentários</h6>
+                        <h6>Comentários</h6>
                         <?php
                         $stmt_comentarios = $conn->prepare("
                             SELECT c.*, u.nome AS nome_usuario_comentario, u.cargo AS cargo_usuario_comentario, u.id AS id_usuario_comentario
@@ -420,7 +415,7 @@ $resultado = $stmt->get_result();
                 botao.addEventListener('click', function(event) {
                     event.preventDefault();
                     if (this.hasAttribute('disabled')) {
-                        return; 
+                        return;
                     }
 
                     const publicacaoId = this.dataset.publicacaoId;
@@ -454,7 +449,7 @@ $resultado = $stmt->get_result();
                             } else if (data.nova_interacao === 'dislike') {
                                 dislikeButton.classList.add('dislike-active');
                             }
-                            
+
                         } else {
                             let mensagemErro = 'Erro ao processar interação.';
                             if (data.mensagem) {

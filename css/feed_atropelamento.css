@@ -76,7 +76,7 @@ body {
 .card-img-top {
     max-height: 100%;
     max-width: 100%;
-        
+
     object-fit: cover;
     object-position: center;
 }
@@ -96,29 +96,32 @@ body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    padding-bottom: 10px; /* Adiciona um pouco de espaço na parte inferior do body */
 }
 
 .card-title {
     font-size: 1.25rem;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem; /* Reduz um pouco a margem abaixo do título */
     color: #212529;
 }
 
 .post-info {
     font-size: 0.9rem;
     color: #6c757d;
+    margin-bottom: 0.75rem; /* Adiciona um pouco de espaço abaixo das informações do post */
 }
 
 .post-info strong {
     color: #495057;
 }
 .description-container {
-    margin-top: 5px;
+    margin-top: 0.75rem; /* Adiciona um pouco de espaço acima da descrição */
     max-height: 150px;
     overflow-y: auto;
-    background-color: #f8f9fa;
+    background-color: #E2E3E5 !important;
     border-radius: 0.5rem;
     padding: 0.5rem;
+    margin-bottom: 0.75rem; /* Adiciona um pouco de espaço abaixo da descrição */
 }
 
 .card-text {
@@ -127,12 +130,14 @@ body {
 }
 
 .card-actions {
-    margin-top: 10px;
+    margin-top: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 6px;
+    padding-top: 10px; /* Aumenta o espaço acima da linha */
     border-top: 1px solid #eee;
+    margin-top: 10px; /* Adiciona um pouco de espaço entre o conteúdo e a linha */
+    padding-bottom: 10px; /* Adiciona espaço abaixo dos botões */
 }
 
 .btn-group {
@@ -142,13 +147,12 @@ body {
 .comment-section {
     max-height: 200px;
     overflow-y: auto;
-    margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid #eee;
 }
 
 .comment {
-    background-color: #f8f9fa;
+    background-color: #E2E3E5 !important;
     border-radius: 0.5rem;
     padding: 0.5rem;
 }
@@ -183,7 +187,7 @@ body {
     font-style: italic;
     color: #6c757d;
     text-align: center;
-    background-color: #F8F9FA;
+    background-color: #E2E3E5;
     border-radius: 0.5rem;
     padding: 1rem;
 }
@@ -230,19 +234,19 @@ body {
         grid-template-columns: 1fr;
         max-width: 600px;
     }
-    
+
     .order-filter-container {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .filter-buttons-container {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 0.5rem;
     }
-    
+
     .filter-button {
         margin: 0;
     }

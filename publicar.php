@@ -10,26 +10,26 @@ if (!isset($_SESSION['usuario_id'])) {
         <title>Acesso Negado</title>
         <style>
             body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-            .container { 
+            .container {
                 background-color: white;
-                padding: 30px; 
+                padding: 30px;
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                text-align: center; 
+                text-align: center;
             }
-            h1 { 
-                color: #d9534f; 
+            h1 {
+                color: #d9534f;
                 margin-bottom: 20px;
             }
-            p { 
-                margin-bottom: 15px; 
+            p {
+                margin-bottom: 15px;
             }
-            .login-link { 
+            .login-link {
                 color: #007bff; text-decoration: none; font-weight: bold;
-             }
-            .login-link:hover { 
+            }
+            .login-link:hover {
                 text-decoration: underline;
-             }
+            }
         </style>
     </head>
     <body>
@@ -62,8 +62,8 @@ if (isset($_SESSION['cargo'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $titulo = $_POST["titulo"];
     $descricao = $_POST["descricao"];
-    $atropelamento = $_POST["atropelamento"]; 
-    
+    $atropelamento = $_POST["atropelamento"];
+
     $categoria_principal = $_POST["categoria"] ?? null;
     $sub_categoria_final = null;
     $nome_cientifico = $_POST['nome_cientifico'] ?? null; // Receber o nome científico
@@ -128,14 +128,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publicar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css"> </head>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
 <body>
-    <nav id="japi-navbar" class="navbar navbar-expand-lg navbar-dark bg-dark"> <div class="container-fluid">
+    <nav id="japi-navbar" class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-end">
+        <div class="container-fluid d-flex justify-content-between">
             <a class="navbar-brand" href="#">JapiWiki</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-link" href="home.php">Home</a>
                     <a class="nav-link" href="<?= htmlspecialchars($painel_voltar) ?>">Painel</a>
@@ -304,11 +306,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 subCategoriaPlantaDiv.style.display = isPlantaChecked ? 'block' : 'none';
                 campoNomeCientificoDiv.style.display = (isAnimalChecked || isPlantaChecked) ? 'block' : 'none'; // Mostrar se animal ou planta
 
-                subCategoriaAnimalRadios.forEach(r => { 
-                    r.required = isAnimalChecked; 
+                subCategoriaAnimalRadios.forEach(r => {
+                    r.required = isAnimalChecked;
                     if (!isAnimalChecked) r.checked = false;
                 });
-                subCategoriaPlantaRadios.forEach(r => { 
+                subCategoriaPlantaRadios.forEach(r => {
                     r.required = isPlantaChecked;
                     if (!isPlantaChecked) r.checked = false;
                 });
