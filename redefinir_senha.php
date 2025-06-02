@@ -5,38 +5,6 @@ error_reporting(E_ALL);
 
 session_start();
 
-
-if (!isset($_SESSION['usuario_id'])) {
-    $html = <<<HTML
-    <!DOCTYPE html>
-    <html lang='pt-br'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Acesso Negado</title>
-        <style>
-            body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-            .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: center; }
-            h1 { color: #d9534f; margin-bottom: 20px; }
-            p { margin-bottom: 15px; }
-            .login-link { color: #007bff; text-decoration: none; font-weight: bold; }
-            .login-link:hover { text-decoration: underline; }
-        </style>
-    </head>
-    <body>
-        <div class='container'>
-            <h1>Acesso Negado</h1>
-            <p>Você precisa estar logado para acessar esta página.</p>
-            <p><a href='login.php' class='login-link'>Fazer Login</a></p>
-        </div>
-    </body>
-    </html>
-    HTML;
-
-    echo $html;
-    exit;
-}
-
 include 'conexao.php';
 
 $mensagem = '';
@@ -81,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Redefinir Senha - Aves Brasil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/redefinir_senha.css">
-    
+
 </head>
 <body>
     <div class="container">
