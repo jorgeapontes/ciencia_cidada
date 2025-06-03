@@ -184,7 +184,6 @@ if ($conn->connect_error) {
         <div class="welcome-text">
             <h1>Bem-vindo ao JapiWiki</h1>
             <p>Uma plataforma colaborativa onde cidadãos e cientistas se unem para compartilhar descobertas e observações sobre a natureza ao nosso redor.</p>
-            <p>Participe de um movimento global de compartilhamento de conhecimento científico sobre espécies, acessível a todos.</p>
             <p>Registre suas observações, compartilhe fotos de espécies interessantes e colabore com especialistas.</p>
             <a href="login.php" class="btn">Junte-se a nós</a>
         </div>
