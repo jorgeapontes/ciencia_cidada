@@ -166,7 +166,7 @@ try {
             case 'publicacao_comentario':
             case 'atropelamento_comentario':
                 if ($comentario_id) {
-                    // Determine o tipo de publicação do comentário para a exclusão correta
+                    // Determine o tipo de publicação do comentário para a exclusão certa
                     $tipo_comentario_db = ($tipo === 'publicacao_comentario') ? 'publicacao' : 'atropelamento';
 
                     $stmt_check_comentario = $conn->prepare("SELECT usuario_id, publicacao_id FROM comentarios WHERE id = ? AND tipo_publicacao = ?");

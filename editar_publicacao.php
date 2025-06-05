@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'
     $atualizar_foto = false;
     $caminho_foto = $publicacao['caminho_foto']; 
 
-    // checar novamente se a publicação pertence ao usuário 
+    // checar dnv se a publicação pertence ao usuário 
     $stmt_check = $conn->prepare("SELECT id, caminho_foto FROM publicacoes WHERE id = ? AND usuario_id = ?");
     $stmt_check->bind_param("ii", $publicacao_id, $_SESSION['usuario_id']);
     $stmt_check->execute();

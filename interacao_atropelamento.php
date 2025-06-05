@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atropelamento_id']) &
     $usuario_id = $_SESSION['usuario_id'];
 
     if ($atropelamento_id !== false && ($tipo === 'like' || $tipo === 'dislike')) {
-        // Verifica se o usuário já interagiu com este post
+        // Verifica se o usuário já interagiu com o post
         $stmt_check = $conn->prepare("SELECT id, tipo FROM interacoes_atropelamentos WHERE usuario_id = ? AND atropelamento_id = ?");
         $stmt_check->bind_param("ii", $usuario_id, $atropelamento_id);
         $stmt_check->execute();

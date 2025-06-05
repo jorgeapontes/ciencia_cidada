@@ -1,4 +1,4 @@
-/* Estilos gerais */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: url('../img/background.jpg') no-repeat center center fixed;
@@ -12,7 +12,7 @@ body {
     position: relative;
 }
 
-/* Overlay semi-transparente */
+
 body::before {
     content: '';
     position: absolute;
@@ -24,13 +24,13 @@ body::before {
     z-index: -1;
 }
 
-/* Container principal */
+
 .container {
     width: 100%;
     padding: 20px;
 }
 
-/* Card de login */
+
 .login-container {
     max-width: 400px;
     margin: 0 auto;
@@ -42,7 +42,7 @@ body::before {
     animation: fadeIn 0.6s ease-out forwards;
 }
 
-/* Título */
+
 h2 {
     color: #2c3e50;
     font-weight: 700;
@@ -51,12 +51,12 @@ h2 {
     font-size: 1.8rem;
 }
 
-/* Formulário */
+
 form {
     margin-top: 1.5rem;
 }
 
-/* Campos de input */
+
 .form-control {
     padding: 0.75rem 1rem;
     border-radius: 8px;
@@ -69,14 +69,14 @@ form {
     box-shadow: 0 0 0 0.25rem rgba(39, 174, 96, 0.25);
 }
 
-/* Labels */
+
 .form-label {
     font-weight: 600;
     color: #34495e;
     margin-bottom: 0.5rem;
 }
 
-/* Botão de login */
+
 .btn-primary {
     background-color: #27ae60;
     border: none;
@@ -97,7 +97,7 @@ form {
     transform: translateY(0);
 }
 
-/* Links */
+
 a {
     color: #3498db;
     text-decoration: none;
@@ -109,7 +109,7 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Mensagem de erro */
+
 .alert-danger {
     background-color: #f8d7da;
     color: #721c24;
@@ -118,20 +118,20 @@ a:hover {
     padding: 0.75rem 1.25rem;
 }
 
-/* Rodapé com links */
+
 .text-center {
     margin-top: 1.5rem;
     font-size: 0.9rem;
     color: #7f8c8d;
 }
 
-/* Animação de entrada */
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsividade */
+
 @media (max-width: 576px) {
     .login-container {
         padding: 1.5rem;

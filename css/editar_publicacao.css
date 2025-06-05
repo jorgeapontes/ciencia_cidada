@@ -77,7 +77,7 @@
             display: inline-block;
         }
 
-        /* Media queries para responsividade */
+   
         @media (max-width: 768px) {
             .container {
                 padding: 15px;

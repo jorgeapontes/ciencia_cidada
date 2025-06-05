@@ -110,53 +110,53 @@ $resultado = $stmt->get_result();
     <link href="css/feed.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        /* Estilos base para botões de interação (like/dislike) */
+   
         .card-actions .btn-group > .like-button,
         .card-actions .btn-group > .dislike-button {
-            background-color: #ffffff; /* Fundo branco */
-            border: 1px solid #ced4da; /* Borda cinza clara (neutra) */
-            padding: 0.30rem 0.6rem;  /* Ajuste fino no padding */
-            font-size: 0.875rem;    /* Tamanho de fonte padrão para botões pequenos */
-            border-radius: 0.25rem; /* Borda arredondada */
-            color: #495057;         /* Cor de texto/ícone neutra (cinza escuro) */
-            margin: 0 3px;          /* Pequeno espaçamento entre os botões */
+            background-color: #ffffff; 
+            border: 1px solid #ced4da; 
+            padding: 0.30rem 0.6rem; 
+            font-size: 0.875rem;    
+            border-radius: 0.25rem; 
+            color: #495057;         
+            margin: 0 3px;         
             cursor: pointer;
             transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out; /* Transição suave */
-            display: inline-flex;   /* Para alinhar ícone e texto corretamente */
-            align-items: center;     /* Alinha ícone e texto verticalmente */
-            line-height: 1.5;       /* Altura da linha padrão */
+            display: inline-flex;  
+            align-items: center;    
+            line-height: 1.5;       
         }
 
         .card-actions .btn-group > .like-button:hover,
         .card-actions .btn-group > .dislike-button:hover {
-            background-color: #f8f9fa; /* Cinza muito claro no hover */
-            border-color: #adb5bd;      /* Borda um pouco mais escura no hover */
+            background-color: #f8f9fa; 
+            border-color: #adb5bd;      
         }
 
-        /* Estilo para like ATIVO (cores neutras) */
+        
         .like-button.like-active {
-            background-color: #e9ecef;   /* Fundo cinza claro para ativo */
-            border-color: #adb5bd;       /* Borda cinza para ativo */
-            color: #28a745;             /* Ícone/texto verde para 'like' ativo (sutil) */
-            /* Se preferir totalmente neutro para o ícone/texto: */
-            /* color: #212529; */      /* Preto/cinza escuro */
+            background-color: #e9ecef;  
+            border-color: #adb5bd;      
+            color: #28a745;            
+            
+            
         }
 
-        /* Estilo para dislike ATIVO (cores neutras) */
+        
         .dislike-button.dislike-active {
-            background-color: #e9ecef; /* Fundo cinza claro para ativo */
-            border-color: #adb5bd;     /* Borda cinza para ativo */
-            color: #dc3545;            /* Ícone/texto vermelho para 'dislike' ativo (sutil) */
-            /* Se preferir totalmente neutro para o ícone/texto: */
-            /* color: #212529; */     /* Preto/cinza escuro */
+            background-color: #e9ecef; 
+            border-color: #adb5bd;     
+            color: #dc3545;            
+           
+           
         }
 
         .card-actions .btn-group > button .badge {
-            background-color: #f8f9fa !important; /* Fundo claro para o contador */
-            color: #212529 !important;           /* Texto escuro para o contador */
-            border: 1px solid #dee2e6;           /* Borda sutil no contador */
-            padding: 0.2em 0.4em;                 /* Padding menor para o badge */
-            font-size: 0.75em;                   /* Fonte menor para o badge */
+            background-color: #f8f9fa !important; 
+            color: #212529 !important;           
+            border: 1px solid #dee2e6;         
+            padding: 0.2em 0.4em;                 
+            font-size: 0.75em;                   
             margin-left: 5px;
         }
 
@@ -178,7 +178,7 @@ $resultado = $stmt->get_result();
         .btn-edit:hover {
             background-color: rgb(0, 146, 224);
         }
-        .disabled-interact, button[disabled] { /* Estilo para botões desabilitados */
+        .disabled-interact, button[disabled] { 
             opacity: 0.65; cursor: not-allowed !important;
         }
         .post-info {
@@ -438,11 +438,11 @@ $resultado = $stmt->get_result();
                             const likeButton = document.querySelector(`.like-button[data-publicacao-id="${publicacaoId}"]`);
                             const dislikeButton = document.querySelector(`.dislike-button[data-publicacao-id="${publicacaoId}"]`);
 
-                            // Remove classes ativas de ambos
+                            
                             likeButton.classList.remove('like-active');
                             dislikeButton.classList.remove('dislike-active');
 
-                            // Adiciona classe ativa ao botão clicado, se a interação foi bem sucedida
+                            
                             if (data.nova_interacao === 'like') {
                                 likeButton.classList.add('like-active');
                             } else if (data.nova_interacao === 'dislike') {

@@ -278,7 +278,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 });
             });
-            // Estado inicial dos campos de atropelamento
+
             if (document.getElementById('atropelamento_sim').checked) {
                 camposAtropelamento.style.display = 'block';
                 dataOcorrenciaInput.required = true;
@@ -288,7 +288,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
 
-            // Mostrar/ocultar sub-categorias, nome científico e definir 'required' dinamicamente
+            // Mostrar/ocultar sub-categorias, nome científico 
             const categoriaAnimalRadio = document.getElementById('categoria_animal');
             const categoriaPlantaRadio = document.getElementById('categoria_planta');
             const subCategoriaAnimalDiv = document.getElementById('sub-categoria-animal-div');
@@ -314,21 +314,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if (!isPlantaChecked) r.checked = false;
                 });
 
-                // Lógica para garantir que pelo menos uma subcategoria seja selecionada se a categoria principal estiver
-                // (Opcional, mas recomendado para UX)
+
+
                 if (isAnimalChecked && !Array.from(subCategoriaAnimalRadios).some(r => r.checked)) {
-                    // Poderia marcar um default ou apenas confiar na validação HTML5
-                    // subCategoriaAnimalRadios[0].checked = true; // Exemplo: marcar o primeiro como default
                 }
                 if (isPlantaChecked && !Array.from(subCategoriaPlantaRadios).some(r => r.checked)) {
-                    // subCategoriaPlantaRadios[0].checked = true; // Exemplo
+
                 }
             }
 
             categoriaAnimalRadio.addEventListener('change', updateSubCategoriaVisibility);
             categoriaPlantaRadio.addEventListener('change', updateSubCategoriaVisibility);
 
-            // Chama a função no carregamento da página
+
             updateSubCategoriaVisibility();
         });
     </script>

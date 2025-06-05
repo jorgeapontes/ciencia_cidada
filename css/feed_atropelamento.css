@@ -51,7 +51,7 @@ body {
     align-items: stretch;
 }
 
-/* Card styles */
+
 .card {
     border: 1px solid #e0e0e0;
     border-radius: 0.5rem;
@@ -63,7 +63,7 @@ body {
     height: 100%;
 }
 
-/* Container da imagem - solução definitiva */
+
 .card-img-container {
     height: 400px;
     display: flex;
@@ -96,32 +96,32 @@ body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding-bottom: 10px; /* Adiciona um pouco de espaço na parte inferior do body */
+    padding-bottom: 10px; 
 }
 
 .card-title {
     font-size: 1.25rem;
-    margin-bottom: 0.5rem; /* Reduz um pouco a margem abaixo do título */
+    margin-bottom: 0.5rem; 
     color: #212529;
 }
 
 .post-info {
     font-size: 0.9rem;
     color: #6c757d;
-    margin-bottom: 0.75rem; /* Adiciona um pouco de espaço abaixo das informações do post */
+    margin-bottom: 0.75rem; 
 }
 
 .post-info strong {
     color: #495057;
 }
 .description-container {
-    margin-top: 0.75rem; /* Adiciona um pouco de espaço acima da descrição */
+    margin-top: 0.75rem; 
     max-height: 150px;
     overflow-y: auto;
     background-color: #E2E3E5 !important;
     border-radius: 0.5rem;
     padding: 0.5rem;
-    margin-bottom: 0.75rem; /* Adiciona um pouco de espaço abaixo da descrição */
+    margin-bottom: 0.75rem; 
 }
 
 .card-text {
@@ -134,10 +134,10 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 10px; /* Aumenta o espaço acima da linha */
+    padding-top: 10px; 
     border-top: 1px solid #eee;
-    margin-top: 10px; /* Adiciona um pouco de espaço entre o conteúdo e a linha */
-    padding-bottom: 10px; /* Adiciona espaço abaixo dos botões */
+    margin-top: 10px; 
+    padding-bottom: 10px; 
 }
 
 .btn-group {

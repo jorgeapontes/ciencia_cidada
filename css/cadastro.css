@@ -56,12 +56,12 @@
             justify-content: center;
         }
         .col-md-6 {
-            max-width: 500px; /* Limita a largura em telas maiores */
+            max-width: 500px; 
             margin-left: auto;
             margin-right: auto;
         }
 
-        /* Media query para telas menores (smartphones) */
+   
         @media (max-width: 576px) {
             .container {
                 margin-top: 20px;
@@ -84,7 +84,7 @@
             }
         }
 
-        /* Media query para telas médias (tablets) */
+ 
         @media (min-width: 577px) and (max-width: 992px) {
             .container {
                 margin-top: 25px;
