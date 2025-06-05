@@ -235,6 +235,9 @@ body {
         max-width: 600px;
     }
 
+    .card-img-container {
+        height: 250px;}
+
     .order-filter-container {
         flex-direction: column;
         gap: 1rem;
