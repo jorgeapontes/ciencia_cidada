@@ -14,11 +14,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nova_senha = $_POST["nova_senha"];
     $confirmar_senha = $_POST["confirmar_senha"];
 
-    // Verificar se as senhas coincidem
+    
     if ($nova_senha !== $confirmar_senha) {
         $mensagem = "As senhas não coincidem!";
     } else {
-        // Verificar se o email existe
+    
         $stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();

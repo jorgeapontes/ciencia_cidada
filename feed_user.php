@@ -234,7 +234,6 @@ $resultado = $stmt->get_result();
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link" href="home.php">Home</a>
                     <a class="nav-link" href="<?= $painel_voltar ?>">Painel</a>
                     <a class="nav-link active" aria-current="page" href="feed_user.php">Feed</a>
                     <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>

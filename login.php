@@ -74,11 +74,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="mt-3 text-center">
                 <a href="cadastro.php">Criar nova conta</a> |
-                <a href="redefinir_senha.php">Esqueci a senha</a>
+                <a href="redefinir_senha.php">Esqueci a senha</a> |
+                <a href="home.php">Home</a>
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

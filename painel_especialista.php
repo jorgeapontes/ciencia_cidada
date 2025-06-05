@@ -191,7 +191,6 @@ usort($posts, function ($a, $b) {
                 <div class="container-fluid">
                     <a class="navbar-brand" href="#" style="color: white !important">JapiWiki</a>
                     <div class="navbar-nav">
-                        <a class="nav-link" href="home.php">Home</a>
                         <a class="nav-link active" href="<?= $painel_voltar ?>">Painel</a>
                         <a class="nav-link" href="feed_user.php">Feed</a>
                         <a class="nav-link" href="feed_atropelamentos.php">Atropelamentos</a>
