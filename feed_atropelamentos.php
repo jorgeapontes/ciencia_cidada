@@ -214,9 +214,15 @@ $resultado = $stmt->get_result();
                         <br>
                         <strong>Data:</strong> <?= date('d/m/Y H:i', strtotime($atropelamento['data_postagem'] ?? '')) ?>                       
                         <br>
-                        <strong>Localização:</strong> <?= htmlspecialchars($atropelamento['local_ocorencia'] ?? '') ?>
+                        <strong>Espécie:</strong> <?= htmlspecialchars($atropelamento['especie'] ?? '') ?><br>
+                        <strong>Localização:</strong> <?= htmlspecialchars($atropelamento['localizacao'] ?? '') ?><br>
+                        <strong>Descrição:</strong> <?= htmlspecialchars($atropelamento['descricao'] ?? '') ?><br>
+                        
+                        
+                        
+                        
                     </div>
-                    <p class="card-text"><?= nl2br(htmlspecialchars($atropelamento['descricao'] ?? '')) ?></p>
+                    
 
                    
 

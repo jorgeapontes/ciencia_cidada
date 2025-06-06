@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_publicacao'
         <?php if ($mensagem): ?>
             <p><?php echo $mensagem; ?></p>
             <?php if ($mensagem === "Publicação atualizada com sucesso!"): ?>
-                <a href="feed_user.php"><button>Voltar para o Feed</button></a>
+                <a href="feed_user.php"><button>Ver no Feed</button></a>
             <?php endif; ?>
         <?php endif; ?>
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 05/06/2025 às 03:01
+-- Tempo de geração: 06/06/2025 às 04:01
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -33,6 +33,7 @@ CREATE TABLE `atropelamentos` (
   `data_ocorrencia` datetime NOT NULL,
   `localizacao` varchar(255) DEFAULT NULL,
   `especie` varchar(255) DEFAULT NULL,
+  `nome_cientifico` varchar(255) DEFAULT NULL,
   `descricao` text DEFAULT NULL,
   `caminho_foto` varchar(255) DEFAULT NULL,
   `data_postagem` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -44,8 +45,9 @@ CREATE TABLE `atropelamentos` (
 -- Despejando dados para a tabela `atropelamentos`
 --
 
-INSERT INTO `atropelamentos` (`id`, `usuario_id`, `data_ocorrencia`, `localizacao`, `especie`, `descricao`, `caminho_foto`, `data_postagem`, `categoria`, `sub_categoria`) VALUES
-(8, 16, '2025-05-19 16:23:00', 'rua x', '', 'Animal encontrado atropelado', 'fotos/682b853091891_x.png', '2025-05-19 19:23:28', 'animal', NULL);
+INSERT INTO `atropelamentos` (`id`, `usuario_id`, `data_ocorrencia`, `localizacao`, `especie`, `nome_cientifico`, `descricao`, `caminho_foto`, `data_postagem`, `categoria`, `sub_categoria`) VALUES
+(15, 16, '2025-06-05 22:50:00', 'Rua x', 'Cachorro', '', 'Animal encontrado atropelado', 'fotos/68424a00c249e_x1.webp', '2025-06-06 01:53:04', 'animal', 'Mamifero'),
+(16, 16, '2025-05-16 20:29:00', 'Rua Y', 'Macaco', 'Macaco', 'Animal atropelado', 'fotos/68424b7bdffba_x2.jpg', '2025-06-06 01:59:23', 'animal', 'Mamifero');
 
 -- --------------------------------------------------------
 
@@ -62,13 +64,6 @@ CREATE TABLE `comentarios` (
   `texto` text NOT NULL,
   `data_comentario` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `comentarios`
---
-
-INSERT INTO `comentarios` (`id`, `publicacao_id`, `tipo_publicacao`, `usuario_id`, `comentario`, `texto`, `data_comentario`) VALUES
-(17, 34, 'publicacao', 12, 'testando', '', '2025-05-29 20:54:38');
 
 -- --------------------------------------------------------
 
@@ -115,16 +110,10 @@ CREATE TABLE `interacoes` (
 --
 
 INSERT INTO `interacoes` (`id`, `publicacao_id`, `usuario_id`, `tipo`, `data_interacao`) VALUES
-(53, 26, 17, 'like', '2025-05-23 00:57:42'),
-(60, 26, 12, 'like', '2025-05-23 04:33:40'),
-(64, 26, 18, 'dislike', '2025-05-27 22:44:04'),
-(69, 26, 16, 'like', '2025-05-29 23:06:27'),
-(71, 34, 16, 'like', '2025-05-29 23:50:04'),
-(101, 35, 14, 'like', '2025-06-02 00:30:19'),
-(123, 36, 14, 'like', '2025-06-02 00:34:47'),
-(129, 26, 14, 'dislike', '2025-06-02 00:39:38'),
-(133, 39, 12, 'like', '2025-06-02 01:19:01'),
-(137, 34, 14, 'dislike', '2025-06-02 01:29:13');
+(138, 43, 16, 'like', '2025-06-06 01:42:16'),
+(139, 42, 16, 'dislike', '2025-06-06 01:42:17'),
+(140, 41, 16, 'like', '2025-06-06 01:42:17'),
+(141, 40, 16, 'dislike', '2025-06-06 01:42:19');
 
 -- --------------------------------------------------------
 
@@ -167,11 +156,10 @@ CREATE TABLE `publicacoes` (
 --
 
 INSERT INTO `publicacoes` (`id`, `especie`, `foto`, `usuario_id`, `data_publicacao`, `titulo`, `descricao`, `caminho_foto`, `atropelamento`, `categoria`, `tipo_especifico`, `sub_categoria`, `nome_cientifico`) VALUES
-(26, '', '', 16, '2025-05-19 16:21:58', 'Tucano', 'Pássaro com um bico longo', 'fotos/682b84d68a9e1_tucano.jpg', 0, 'animal', NULL, NULL, NULL),
-(34, '', '', 16, '2025-05-29 20:49:56', 'Águia', 'testando post de águia', 'fotos/6838f2a4803c9_águia.jpeg', 0, 'animal', NULL, 'Ave', NULL),
-(35, '', '', 16, '2025-05-29 20:51:06', 'Araucária', 'post sobre planta', 'fotos/6838f2ea172b1_Araucaria.jpg', 0, 'planta', NULL, 'Arvore', NULL),
-(36, '', '', 19, '2025-05-29 21:15:17', 'Araucária', 'teste', 'fotos/6838f8959b21a_Araucaria.jpg', 0, 'planta', NULL, 'Arvore', NULL),
-(39, '', '', 12, '2025-06-01 22:18:34', 'Anaconda', 'A anaconda, especialmente a anaconda-verde (Eunectes murinus), é uma cobra constritora gigante e não venenosa, encontrada em áreas quentes da América do Sul. É uma das maiores cobras do mundo, com fêmeas frequentemente maiores que os machos. Elas são conhecidas por sua robustez e tamanho, podendo atingir até 9 metros de comprimento e pesar mais de 250 kg. ', 'fotos/683cfbeae6ba8_anaconda.jpg', 0, 'animal', NULL, 'Reptil', 'Eunectes murinus');
+(40, '', '', 16, '2025-06-05 22:34:50', 'Onça parda ', 'O segundo maior felino das Américas, também conhecida como leão-baio. ', 'fotos/684245ba20268_onça.jpeg', 0, 'animal', NULL, 'Mamifero', 'Puma concolor'),
+(41, '', '', 16, '2025-06-05 22:36:50', 'Araucária', 'Árvore conífera.', 'fotos/684246320468e_Araucaria.jpg', 0, 'planta', NULL, 'Arvore', 'Araucária'),
+(42, '', '', 16, '2025-06-05 22:38:38', 'Tuiuiú', 'Essa é uma ave ciconiforme da família Ciconiidae.', 'fotos/6842469e05147_tuiuiu.jpeg', 0, 'animal', NULL, 'Ave', 'Jabiru mycteria'),
+(43, '', '', 16, '2025-06-05 22:42:10', 'Manacá da Serra', 'O manacá-da-serra é uma árvore pioneira da Mata Atlântica brasileira, muito característica da encosta úmida da Serra do Mar e da floresta ombrófila densa da encosta atlântica dos estados do Paraná, Rio de Janeiro, Santa Catarina e São Paulo', 'fotos/684247721fea3_manaca_da_serra.webp', 0, 'planta', NULL, 'Arbusto', 'Tibouchina mutabilis');
 
 -- --------------------------------------------------------
 
@@ -277,7 +265,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de tabela `atropelamentos`
 --
 ALTER TABLE `atropelamentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de tabela `comentarios`
@@ -301,7 +289,7 @@ ALTER TABLE `curtidas`
 -- AUTO_INCREMENT de tabela `interacoes`
 --
 ALTER TABLE `interacoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
 
 --
 -- AUTO_INCREMENT de tabela `interacoes_atropelamentos`
@@ -313,7 +301,7 @@ ALTER TABLE `interacoes_atropelamentos`
 -- AUTO_INCREMENT de tabela `publicacoes`
 --
 ALTER TABLE `publicacoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
